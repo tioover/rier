@@ -1,0 +1,24 @@
+[package]
+
+name = "rier"
+version = "0.0.1"
+authors = ["tioover <tioover@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/tioover/rier.git"
+description = "Rier is a simple graphics rendering library."
+
+
+[lib]
+name = "rier"
+path = "src/lib.rs"
+
+[dependencies]
+num = "*"
+glutin = "*"
+glium = "*"
+time = "*"
+rand = "*"
+cgmath = "*"
+image = "*"
+either = "*"
