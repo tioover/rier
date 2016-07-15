@@ -41,7 +41,7 @@ impl Camera2D
 
 impl Camera for Camera2D
 {
-    fn matrix(&self) -> Matrix4<f32>
+    fn matrix(&self) -> Mat
     {
         let factor = self.display.get_window().unwrap().hidpi_factor();
         let (w, h) = self.display.get_framebuffer_dimensions();
