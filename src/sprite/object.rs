@@ -1,6 +1,6 @@
 use Id;
 use Transform;
-use texture::TexRef;
+use texture;
 use super::graphics::Graphics;
 
 
@@ -18,7 +18,7 @@ pub struct Sprite
 
 impl Sprite
 {
-    pub fn new(tex: &TexRef, tex_rect: ::Rect, width: f32, height: f32) -> Sprite
+    pub fn new(tex: &texture::Ref, tex_rect: ::Rect, width: f32, height: f32) -> Sprite
     {
         let id = Id::new();
         let transform = Transform::new();

@@ -1,8 +1,8 @@
 use std::cell::RefCell;
 use glium::{ Display, Frame, DrawError };
-use texture::TexRef;
+use texture;
 use mesh;
-use render::Renderer;
+use render;
 use Mat;
 use Rect;
 
@@ -35,7 +35,7 @@ implement_vertex!{ Vertex, position, tex_coords }
 
 
 
-impl ::Graphics for Graphics
+impl render::Graphics for Graphics
 {
     type Vertex = Vertex;
 
@@ -57,7 +57,7 @@ pub struct Graphics
     opacity: f32,
     width: f32,
     height: f32,
-    texture: TexRef,
+    texture: texture::Ref,
     texture_rect: Rect,
     mesh_cache: RefCell<Option<Mesh>>,
 }
@@ -65,7 +65,7 @@ pub struct Graphics
 impl Graphics
 {
     #[doc(hidden)]
-    pub fn new(tex: &TexRef, tex_rect: Rect, width: f32, height: f32) -> Graphics
+    pub fn new(tex: &texture::Ref, tex_rect: Rect, width: f32, height: f32) -> Graphics
     {
         Graphics
         {
@@ -96,7 +96,7 @@ impl Graphics
     }
 
     /// Renders this sprite.
-    pub fn render<'tex>(&self, target: &mut Frame, renderer: &Renderer<Self>,
+    pub fn render<'tex>(&self, target: &mut Frame, renderer: &render::Renderer<Self>,
                         camera: &Mat, transform: &Mat)
         -> Result<(), DrawError>
     {

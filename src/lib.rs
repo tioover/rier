@@ -12,6 +12,7 @@ mod id;
 mod main_loop;
 mod transform;
 mod rect;
+pub mod loader;
 pub mod texture;
 pub mod mesh;
 pub mod camera;
