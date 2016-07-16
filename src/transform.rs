@@ -41,7 +41,7 @@ impl Transform
     /// Builds transform matrix.
     pub fn matrix<'a>(&'a self) -> &'a Mat
     {
-        self.cache.get(move || {
+        self.cache.get(|| {
             Matrix4::from_translation(self.position) *
             Matrix4::from(*Basis3::from(self.rotation).as_ref()) *
             Matrix4::from_scale(self.scale)

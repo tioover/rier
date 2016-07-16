@@ -80,7 +80,7 @@ impl Graphics
 
     fn get_mesh<'a>(&'a self, display: &Display) -> &'a Mesh
     {
-        self.mesh_cache.get(move || {
+        self.mesh_cache.get(|| {
 
             // Generate mash.
             let (width, height) = (self.width, self.height);
