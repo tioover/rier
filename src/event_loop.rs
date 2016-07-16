@@ -2,7 +2,7 @@ use glium::glutin::Event;
 use glium::{ Display, Surface, Frame };
 
 
-/// Main rendering loop.
+/// Main rendering and event processing loop.
 pub struct Loop<F: FnMut(&mut Frame)>
 {
     display: Display,
