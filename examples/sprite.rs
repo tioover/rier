@@ -28,7 +28,6 @@ fn main()
     rier::Loop::new(&display, move |mut target|
     {
         let cam = camera.matrix();
-        let transform = sprite.transform.matrix();
-        sprite.graphics.render(target, &renderer, &cam, &transform).unwrap();
+        sprite.render(target, &renderer, &cam).unwrap();
     }).start();
 }
