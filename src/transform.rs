@@ -1,9 +1,10 @@
 //! Component that describes the transform of object.
 use num::Zero;
 use cgmath::{ Vector3, Matrix4, Basis3, Quaternion };
+use utils::Cache;
+use Mat;
 
 /// Position, rotation and scale of an object.
-#[derive(Clone, PartialEq)]
 pub struct Transform
 {
     /// Ojbect scale, default `1`.
@@ -12,6 +13,7 @@ pub struct Transform
     pub position: Vector3<f32>,
     /// Object rotation, default do nothing.
     pub rotation: Quaternion<f32>,
+    cache: Cache<Mat>,
 }
 
 
@@ -26,6 +28,7 @@ impl Transform
             scale: 1.0,
             position: Vector3::zero(),
             rotation: Quaternion::zero(),
+            cache: Cache::new(),
         }
     }
 
@@ -36,10 +39,12 @@ impl Transform
     }
 
     /// Builds transform matrix.
-    pub fn matrix(&self) -> Matrix4<f32>
+    pub fn matrix<'a>(&'a self) -> &'a Mat
     {
-        Matrix4::from_translation(self.position) *
-        Matrix4::from(*Basis3::from(self.rotation).as_ref()) *
-        Matrix4::from_scale(self.scale)
+        self.cache.get(move || {
+            Matrix4::from_translation(self.position) *
+            Matrix4::from(*Basis3::from(self.rotation).as_ref()) *
+            Matrix4::from_scale(self.scale)
+        })
     }
 }

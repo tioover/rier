@@ -1,10 +1,10 @@
-use std::cell::RefCell;
 use glium::{ Display, Frame, DrawError };
 use texture;
 use mesh;
 use render;
 use Mat;
 use texture::Rect;
+use utils::Cache;
 
 
 type Mesh = mesh::Mesh<Vertex>;
@@ -59,7 +59,7 @@ pub struct Graphics
     height: f32,
     texture: texture::Ref,
     texture_rect: Rect,
-    mesh_cache: RefCell<Option<Mesh>>,
+    mesh_cache: Cache<Mesh>,
 }
 
 impl Graphics
@@ -74,29 +74,28 @@ impl Graphics
             height: height,
             texture: tex.clone(),
             opacity: 1.0,
-            mesh_cache: RefCell::new(None),
+            mesh_cache: Cache::new(),
         }
     }
 
-    fn build_mesh(&self, display: &Display)
+    fn get_mesh<'a>(&'a self, display: &Display) -> &'a Mesh
     {
-        // Get cache.
-        let mut mesh_cache = self.mesh_cache.borrow_mut();
-        if mesh_cache.is_some() { return }
-        // Generate mash.
-        let (width, height) = (self.width, self.height);
-        let (w, h) = (self.texture_rect.w as i32, self.texture_rect.h as i32);
-        let (x, y) = (self.texture_rect.x, self.texture_rect.y);
-        let verties = [
-            Vertex::new(  0.0, height, x+0, y+h),
-            Vertex::new(  0.0,    0.0, x+0, y+0),
-            Vertex::new(width,    0.0, x+w, y+0),
-            Vertex::new(width,    0.0, x+w, y+0),
-            Vertex::new(width, height, x+w, y+h),
-            Vertex::new(  0.0, height, x+0, y+h),
-        ];
-        // Update cache.
-        *mesh_cache = Some(Mesh::new(display, &verties).unwrap())
+        self.mesh_cache.get(move || {
+
+            // Generate mash.
+            let (width, height) = (self.width, self.height);
+            let (w, h) = (self.texture_rect.w as i32, self.texture_rect.h as i32);
+            let (x, y) = (self.texture_rect.x, self.texture_rect.y);
+            let verties = [
+                Vertex::new(  0.0, height, x+0, y+h),
+                Vertex::new(  0.0,    0.0, x+0, y+0),
+                Vertex::new(width,    0.0, x+w, y+0),
+                Vertex::new(width,    0.0, x+w, y+0),
+                Vertex::new(width, height, x+w, y+h),
+                Vertex::new(  0.0, height, x+0, y+h),
+            ];
+            Mesh::new(display, &verties).unwrap()
+        })
     }
 
     /// Renders this sprite.
@@ -113,8 +112,7 @@ impl Graphics
             camera: *camera,
             transform: *transform,
         };
-        self.build_mesh(&renderer.display);
-        let mesh = self.mesh_cache.borrow();
-        renderer.draw(target, mesh.as_ref().unwrap(), &uniforms)
+        let mesh = self.get_mesh(&renderer.display);
+        renderer.draw(target, mesh, &uniforms)
     }
 }
