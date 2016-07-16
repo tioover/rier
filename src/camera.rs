@@ -1,7 +1,6 @@
 //! Camera.
 
 use glium::Display;
-use cgmath::Matrix4;
 use transform::Transform;
 use Mat;
 

@@ -1,8 +1,8 @@
 extern crate rier;
 extern crate image;
 use std::path::PathBuf;
-use rier::{ Rect, texture };
-use rier::sprite::{ Sprite };
+use rier::texture;
+use rier::sprite::Sprite;
 use rier::camera::{ Camera, Camera2D };
 use rier::loader::Resource;
 
@@ -21,8 +21,8 @@ fn main()
 
         Sprite::new(
             &texture::Ref::new(texture),
-            Rect { w: 256, h: 256, x: 0, y: 0 },
-            100.0, 100.0)
+            texture::Rect { w: 256, h: 256, x: 0, y: 0 },
+            (100.0, 100.0))
     };
 
     rier::Loop::new(&display, move |mut target|

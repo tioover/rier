@@ -4,13 +4,13 @@ use texture;
 use mesh;
 use render;
 use Mat;
-use Rect;
+use texture::Rect;
 
 
 type Mesh = mesh::Mesh<Vertex>;
 
 
-/// 2D Sprite vertex type
+/// 2D vertex type.
 #[derive(Copy, Clone)]
 pub struct Vertex
 {
@@ -78,8 +78,12 @@ impl Graphics
         }
     }
 
-    fn build_mesh(&self, display: &Display) -> Mesh
+    fn build_mesh(&self, display: &Display)
     {
+        // Get cache.
+        let mut mesh_cache = self.mesh_cache.borrow_mut();
+        if mesh_cache.is_some() { return }
+        // Generate mash.
         let (width, height) = (self.width, self.height);
         let (w, h) = (self.texture_rect.w as i32, self.texture_rect.h as i32);
         let (x, y) = (self.texture_rect.x, self.texture_rect.y);
@@ -91,13 +95,13 @@ impl Graphics
             Vertex::new(width, height, x+w, y+h),
             Vertex::new(  0.0, height, x+0, y+h),
         ];
-
-        Mesh::new(display, &verties).unwrap()
+        // Update cache.
+        *mesh_cache = Some(Mesh::new(display, &verties).unwrap())
     }
 
     /// Renders this sprite.
-    pub fn render<'tex>(&self, target: &mut Frame, renderer: &render::Renderer<Self>,
-                        camera: &Mat, transform: &Mat)
+    pub fn render(&self, target: &mut Frame, renderer: &render::Renderer<Self>,
+                  camera: &Mat, transform: &Mat)
         -> Result<(), DrawError>
     {
         let camera: &[[_; 4]; 4] = camera.as_ref();
@@ -109,13 +113,7 @@ impl Graphics
             camera: *camera,
             transform: *transform,
         };
-        {
-            let mut mesh_cache = self.mesh_cache.borrow_mut();
-            if mesh_cache.is_none()
-            {
-                *mesh_cache = Some(self.build_mesh(&renderer.display))
-            }
-        }
+        self.build_mesh(&renderer.display);
         let mesh = self.mesh_cache.borrow();
         renderer.draw(target, mesh.as_ref().unwrap(), &uniforms)
     }
