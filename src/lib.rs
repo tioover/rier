@@ -11,6 +11,7 @@ extern crate either;
 mod id;
 mod transform;
 mod event_loop;
+pub mod event;
 pub mod loader;
 pub mod texture;
 pub mod mesh;
