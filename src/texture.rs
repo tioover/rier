@@ -17,6 +17,7 @@ pub type Texture = CompressedSrgbTexture2d;
 pub struct Raw(RawImage2d<'static, u8>);
 
 impl Raw {
+    /// Creates texture use data.
     pub fn process(self, display: &Display) -> Result<Texture, TextureCreationError> {
         let Raw(image) = self;
         Texture::new(display, image)
@@ -48,7 +49,7 @@ impl Ref {
 
 impl AsUniformValue for Ref {
     fn as_uniform_value(&self) -> UniformValue {
-        UniformValue::CompressedSrgbTexture2d(&self.0, None)
+        UniformValue::CompressedSrgbTexture2d(&*self, None)
     }
 }
 
@@ -57,7 +58,8 @@ impl Deref for Ref {
     type Target = Texture;
 
     fn deref(&self) -> &Texture {
-        self.0.deref()
+        let &Ref(ref tex) = self;
+        tex.deref()
     }
 }
 

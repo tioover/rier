@@ -47,6 +47,14 @@ pub fn sleep_ms(ms: u32) {
 
 
 /// Cache cell.
+/// # Example
+///
+/// ```
+/// use rier::utils::Cache;
+///
+/// let cache = Cache::new();
+/// assert_eq!(cache.get(|| 42i32), &42i32);
+/// ```
 pub struct Cache<T> {
     data: UnsafeCell<Option<T>>,
 }

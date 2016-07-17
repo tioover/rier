@@ -11,7 +11,17 @@ pub enum Return {
     Dead,
 }
 
-
+/// Event sender.
+///
+/// # Example
+///
+/// ```
+/// use rier::event::{Notifier, Return};
+///
+/// let mut notifier = Notifier::new();
+/// notifier.register(|e| {assert_eq!(e, &42i32); Return::None});
+/// notifier.notify(42i32);
+/// ```
 pub struct Notifier<E> {
     subscribers: Vec<Box<Fn(&E) -> Return>>,
 }

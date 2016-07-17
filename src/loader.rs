@@ -42,7 +42,7 @@ impl<T: Resource> Loader<T> {
 pub trait Resource: Sized {
     /// Load result type.
     ///
-    /// For example, we need load `Image`, `Result` is `Result<Image, Error>`.
+    /// For example, If we load `Image`, the `Result` is `Result<Image, Error>`.
     type Result: Send + 'static;
 
     /// Synchronize load.

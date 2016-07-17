@@ -17,13 +17,10 @@ pub struct Sprite {
 
 impl Sprite {
     pub fn new(tex: &texture::Ref, rect: texture::Rect, (width, height): (f32, f32)) -> Sprite {
-        let id = Id::new();
-        let transform = Transform::new();
-        let graphics = Graphics::new(tex, rect, width, height);
         Sprite {
-            id: id,
-            transform: transform,
-            graphics: graphics,
+            id: Id::new(),
+            graphics: Graphics::new(tex, rect, width, height),
+            transform: Transform::new(),
         }
     }
 
