@@ -15,7 +15,6 @@ path = "src/lib.rs"
 
 [dependencies]
 num = "*"
-glutin = "*"
 glium = "*"
 time = "*"
 rand = "*"
