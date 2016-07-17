@@ -8,22 +8,19 @@ use rier::texture;
 use rier::sprite::Sprite;
 use rier::camera::{Camera, Camera2D};
 use rier::loader::Resource;
-use rier::utils::sleep_ms;
+use rier::utils::{sleep_ms, build_display};
 use rier::event::{Notifier, Return};
 
 
 fn main()
 {
-    let display = rier::utils::build_display("Sprite", (800, 600));
+    let display = build_display("Sprite", (800, 600));
     let tex_path = PathBuf::from("examples/assets/block.png");
     let renderer = rier::render::Renderer::new(&display).unwrap();
 
     let mut notifier = Notifier::new();
     // register callback
-    notifier.register(|e| {
-        println!("{:?}", e);
-        Return::None
-    });
+    notifier.register(|_| Return::None);
 
     let camera = Camera2D::new(&display);
     let sprite = {
