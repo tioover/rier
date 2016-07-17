@@ -1,7 +1,8 @@
 //! [Rier](https://github.com/tioover/rier) is a simple graphics rendering library.
 extern crate num;
 extern crate cgmath;
-#[macro_use] extern crate glium;
+#[macro_use]
+extern crate glium;
 extern crate time;
 extern crate rand;
 extern crate image;

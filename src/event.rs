@@ -4,8 +4,7 @@
 
 
 /// Callback function returns.
-pub enum Return
-{
+pub enum Return {
     /// Nothing.
     None,
     /// The callback will be moved.
@@ -13,16 +12,13 @@ pub enum Return
 }
 
 
-pub struct Notifier<E>
-{
+pub struct Notifier<E> {
     subscribers: Vec<Box<Fn(&E) -> Return>>,
 }
 
 
-impl<E> Notifier<E>
-{
-    pub fn new() -> Notifier<E>
-    {
+impl<E> Notifier<E> {
+    pub fn new() -> Notifier<E> {
         Notifier { subscribers: Vec::new() }
     }
 
@@ -34,12 +30,9 @@ impl<E> Notifier<E>
     }
 
     /// Notify new event.
-    pub fn notify(&mut self, event: E)
-    {
-        self.subscribers.retain(|f|
-        {
-            match f(&event)
-            {
+    pub fn notify(&mut self, event: E) {
+        self.subscribers.retain(|f| {
+            match f(&event) {
                 Return::Dead => false,
                 _ => true,
             }

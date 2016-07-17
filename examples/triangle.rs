@@ -6,23 +6,20 @@ use glium::Surface;
 use glium::glutin;
 
 #[derive(Copy, Clone)]
-struct Vertex
-{
+struct Vertex {
     position: [f32; 2],
     color: [f32; 3],
 }
 
-implement_vertex! { Vertex, position, color }
+implement_vertex! {Vertex, position, color}
 
 struct Graphics;
 
 
-impl rier::Graphics for Graphics
-{
+impl rier::Graphics for Graphics {
     type Vertex = Vertex;
 
-    fn vertex() -> &'static str
-    {
+    fn vertex() -> &'static str {
 r#"
 #version 140
 in vec2 position;
@@ -36,8 +33,7 @@ void main()
 "#
     }
 
-    fn fragment() -> &'static str
-    {
+    fn fragment() -> &'static str {
 r#"
 #version 140
 in vec3 vColor;
@@ -61,13 +57,10 @@ fn main()
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
             Vertex { position: [ 1.0, -1.0], color: [1.0, 0.0, 0.0] },
         ]).unwrap();
-    'main: loop
-    {
+    'main: loop {
 
-        for event in display.poll_events()
-        {
-            match event
-            {
+        for event in display.poll_events() {
+            match event {
                 glutin::Event::Closed => break 'main,
                 _ => (),
             }

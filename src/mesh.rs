@@ -2,9 +2,9 @@
 
 use glium;
 use glium::Display;
-use glium::{ index, vertex };
-use glium::index::{ PrimitiveType, NoIndices, IndicesSource };
-use either::{ Either, Left, Right };
+use glium::{index, vertex};
+use glium::index::{PrimitiveType, NoIndices, IndicesSource};
+use either::{Either, Left, Right};
 
 pub use glium::VertexBuffer;
 pub use glium::Vertex;
@@ -17,8 +17,7 @@ pub type IndexBuffer = glium::IndexBuffer<Index>;
 
 
 /// Mesh is a collection of vertices, edges and faces.
-pub struct Mesh<T: Vertex>
-{
+pub struct Mesh<T: Vertex> {
     /// Vertex buffer.
     pub vertices: VertexBuffer<T>,
     /// Index buffer or none.
@@ -26,31 +25,27 @@ pub struct Mesh<T: Vertex>
 }
 
 
-impl<T: Vertex> Mesh<T>
-{
+impl<T: Vertex> Mesh<T> {
     /// Creates a simple mesh object.
     /// Primitive type is triangles list, no indices need.
-    pub fn new(display: &Display, vertices: &[T])
-        -> Result<Mesh<T>, CreationError>
-    {
-        Ok(Mesh
-        {
+    pub fn new(display: &Display, vertices: &[T]) -> Result<Mesh<T>, CreationError> {
+        Ok(Mesh {
             vertices: try!(VertexBuffer::new(display, vertices)),
             indices: Right(NoIndices(PrimitiveType::TrianglesList)),
         })
     }
 
     /// Create a mesh with the given buffers.
-    pub fn buffer(vertices: VertexBuffer<T>, indices: IndexBuffer) -> Mesh<T>
-    {
-        Mesh { vertices: vertices, indices: Left(indices) }
+    pub fn buffer(vertices: VertexBuffer<T>, indices: IndexBuffer) -> Mesh<T> {
+        Mesh {
+            vertices: vertices,
+            indices: Left(indices),
+        }
     }
 
     #[doc(hidden)]
-    pub fn indices_source<'a>(&'a self) -> IndicesSource<'a>
-    {
-        return match self.indices
-        {
+    pub fn indices_source<'a>(&'a self) -> IndicesSource<'a> {
+        return match self.indices {
             Left(ref x) => x.into(),
             Right(ref x) => x.into(),
         };
@@ -60,8 +55,7 @@ impl<T: Vertex> Mesh<T>
 
 /// Errors which can occur when attempting to create a Mesh.
 #[derive(Debug)]
-pub enum CreationError
-{
+pub enum CreationError {
     /// Vertex buffer create failure.
     Vertex(vertex::BufferCreationError),
     /// Index buffer create failure.
@@ -69,19 +63,15 @@ pub enum CreationError
 }
 
 
-impl From<index::BufferCreationError> for CreationError
-{
-    fn from(err: index::BufferCreationError) -> CreationError
-    {
+impl From<index::BufferCreationError> for CreationError {
+    fn from(err: index::BufferCreationError) -> CreationError {
         CreationError::Index(err)
     }
 }
 
 
-impl From<vertex::BufferCreationError> for CreationError
-{
-    fn from(err: vertex::BufferCreationError) -> CreationError
-    {
+impl From<vertex::BufferCreationError> for CreationError {
+    fn from(err: vertex::BufferCreationError) -> CreationError {
         CreationError::Vertex(err)
     }
 }

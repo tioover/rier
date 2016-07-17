@@ -4,8 +4,7 @@ use rand;
 
 /// Unique identifier.
 #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Copy, Clone)]
-pub struct Id
-{
+pub struct Id {
     /// Created time.
     pub time: time::Timespec,
     /// Random number.
@@ -13,13 +12,10 @@ pub struct Id
 }
 
 
-impl Id
-{
+impl Id {
     // Creates unique id.
-    pub fn new() -> Id
-    {
-        Id
-        {
+    pub fn new() -> Id {
+        Id {
             random: rand::random(),
             time: time::now().to_timespec(),
         }

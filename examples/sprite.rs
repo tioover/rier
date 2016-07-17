@@ -6,10 +6,10 @@ use glium::Surface;
 use glium::glutin;
 use rier::texture;
 use rier::sprite::Sprite;
-use rier::camera::{ Camera, Camera2D };
+use rier::camera::{Camera, Camera2D};
 use rier::loader::Resource;
 use rier::utils::sleep_ms;
-use rier::event::{ Notifier, Return };
+use rier::event::{Notifier, Return};
 
 
 fn main()
@@ -26,8 +26,7 @@ fn main()
     });
 
     let camera = Camera2D::new(&display);
-    let sprite =
-    {
+    let sprite = {
         let texture = texture::Raw::load(&tex_path)
             .unwrap()
             .process(&display)
@@ -39,13 +38,10 @@ fn main()
             (100.0, 100.0))
     };
 
-    'main: loop
-    {
+    'main: loop {
 
-        for event in display.poll_events()
-        {
-            match event
-            {
+        for event in display.poll_events() {
+            match event {
                 glutin::Event::Closed => break 'main,
                 e => notifier.notify(e),
             }
