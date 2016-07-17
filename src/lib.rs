@@ -10,7 +10,6 @@ extern crate either;
 
 mod id;
 mod transform;
-mod event_loop;
 pub mod event;
 pub mod loader;
 pub mod texture;
@@ -27,5 +26,4 @@ pub type Mat = cgmath::Matrix4<f32>;
 
 pub use id::Id;
 pub use render::Graphics;
-pub use event_loop::Loop;
 pub use transform::Transform;

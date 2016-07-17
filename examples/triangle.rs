@@ -2,6 +2,8 @@
 #[macro_use] extern crate glium;
 extern crate cgmath;
 use glium::uniforms::EmptyUniforms;
+use glium::Surface;
+use glium::glutin;
 
 #[derive(Copy, Clone)]
 struct Vertex
@@ -59,9 +61,20 @@ fn main()
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
             Vertex { position: [ 1.0, -1.0], color: [1.0, 0.0, 0.0] },
         ]).unwrap();
-    rier::Loop::new(&display,
-        move |mut target|
+    'main: loop
+    {
+
+        for event in display.poll_events()
         {
-            let _ = renderer.draw(target, &mesh, &EmptyUniforms).unwrap();
-        }).start();
+            match event
+            {
+                glutin::Event::Closed => break 'main,
+                _ => (),
+            }
+        }
+        let mut target = display.draw();
+        target.clear_color(0., 0., 0., 0.);
+        let _ = renderer.draw(&mut target, &mesh, &EmptyUniforms).unwrap();
+        target.finish().unwrap();
+    }
 }

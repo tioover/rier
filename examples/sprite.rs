@@ -1,16 +1,30 @@
 extern crate rier;
+extern crate glium;
 extern crate image;
 use std::path::PathBuf;
+use glium::Surface;
+use glium::glutin;
 use rier::texture;
 use rier::sprite::Sprite;
 use rier::camera::{ Camera, Camera2D };
 use rier::loader::Resource;
+use rier::utils::sleep_ms;
+use rier::event::{ Notifier, Return };
+
 
 fn main()
 {
     let display = rier::utils::build_display("Sprite", (800, 600));
     let tex_path = PathBuf::from("examples/assets/block.png");
     let renderer = rier::render::Renderer::new(&display).unwrap();
+
+    let mut notifier = Notifier::new();
+    // register callback
+    notifier.register(|e| {
+        println!("{:?}", e);
+        Return::None
+    });
+
     let camera = Camera2D::new(&display);
     let sprite =
     {
@@ -25,9 +39,22 @@ fn main()
             (100.0, 100.0))
     };
 
-    rier::Loop::new(&display, move |mut target|
+    'main: loop
     {
+
+        for event in display.poll_events()
+        {
+            match event
+            {
+                glutin::Event::Closed => break 'main,
+                e => notifier.notify(e),
+            }
+        }
+        let mut target = display.draw();
+        target.clear_color(0., 0., 0., 0.);
         let cam = camera.matrix();
-        sprite.render(target, &renderer, &cam).unwrap();
-    }).start();
+        sprite.render(&mut target, &renderer, &cam).unwrap();
+        target.finish().unwrap();
+        sleep_ms(4);
+    }
 }

@@ -1,48 +1,48 @@
-use std::rc::{ Rc, Weak };
-pub use glium::glutin::Event as WindowEvent;
+//! Event notification system.
+//!
+//! Use Observer Design Pattern.
 
 
-pub trait Event: Clone + Sized + 'static
+/// Callback function returns.
+pub enum Return
 {
+    /// Nothing.
+    None,
+    /// The callback will be moved.
+    Dead,
 }
 
-impl Event for WindowEvent {}
 
-
-pub struct SubscriberList<E: Event>
+pub struct Notifier<E>
 {
-    list: Vec<Weak<Subscriber<E>>>,
+    subscribers: Vec<Box<Fn(&E) -> Return>>,
 }
 
 
-impl<E: Event> SubscriberList<E>
+impl<E> Notifier<E>
 {
-    pub fn new() -> SubscriberList<E>
+    pub fn new() -> Notifier<E>
     {
-        SubscriberList { list: Vec::new() }
+        Notifier { subscribers: Vec::new() }
     }
 
-    pub fn register(&mut self, subscriber: &Rc<Subscriber<E>>)
+    /// Register event callback function.
+    pub fn register<F>(&mut self, callback: F)
+        where F: 'static + Fn(&E) -> Return
     {
-        self.list.push(Rc::downgrade(subscriber));
+        self.subscribers.push(Box::new(callback));
     }
 
+    /// Notify new event.
     pub fn notify(&mut self, event: E)
     {
-        self.list.retain(|x| {
-            let x = x.upgrade();
-            if let Some(x) = x
+        self.subscribers.retain(|f|
+        {
+            match f(&event)
             {
-                x.notify(&event);
-                true
+                Return::Dead => false,
+                _ => true,
             }
-            else { false }
         })
     }
-}
-
-
-pub trait Subscriber<E: Event>
-{
-    fn notify(&self, event: &E);
 }
