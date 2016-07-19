@@ -1,4 +1,5 @@
 //! Camera.
+use cgmath::Ortho;
 use context::Context;
 use transform::Transform;
 use Mat;
@@ -37,15 +38,15 @@ impl Camera2D {
 impl Camera for Camera2D {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     fn matrix(&self) -> Mat {
-        let factor = self.context.hidpi_factor();
         let (w, h) = self.context.display.get_framebuffer_dimensions();
-        let (w, h) = (w as f32, h as f32);
-        let f = factor * 2.0;
-        Mat::new(
-             f/w,  0.0,  0.0, 0.0,
-             0.0, -f/h,  0.0, 0.0,
-             0.0,  0.0, -1.0, 0.0,
-            -1.0,  1.0,  0.0, 1.0,
-        ) * self.transform.matrix()
+        let ortho = Ortho {
+            left: 0.0,
+            right: w as f32,
+            bottom: 0.0,
+            top: h as f32,
+            near: -1.0,
+            far: 1.0,
+        };
+        Mat::from(ortho) * self.transform.matrix()
     }
 }

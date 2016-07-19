@@ -4,7 +4,8 @@ extern crate image;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::cell::RefCell;
-use glium::{Surface, glutin};
+use glium::Surface;
+use glium::glutin::Event;
 use rier::texture;
 use rier::sprite::Sprite;
 use rier::Context;
@@ -19,7 +20,7 @@ struct Block {
 }
 
 impl Block {
-    fn new(ctx: Context, notifier: &mut Notifier<glutin::Event>) -> Block {
+    fn new(ctx: Context, notifier: &mut Notifier<Event>) -> Block {
         let texture = texture::Raw::load(&PathBuf::from("examples/assets/block.png"))
             .unwrap()
             .process(&ctx)
@@ -33,18 +34,17 @@ impl Block {
         block
     }
 
-    fn event_register(&self, notifier: &mut Notifier<glutin::Event>) {
+    fn event_register(&self, notifier: &mut Notifier<Event>) {
         let weak = Rc::downgrade(&self.sprite);
         notifier.register(move |e| {
+            println!("{:?}", e);
             match e {
-                &glutin::Event::MouseMoved(x, y) => {
-                    // TODO: Get real HiDPI factor, not `2.0`.
-                    let (x, y) = (x as f32 / 2.0, y as f32 / 2.0);
+                &Event::MouseMoved(x, y) => {
                     match weak.upgrade() {
                         None => Return::Dead,
                         Some(sprite) => {
                             let mut sprite = sprite.borrow_mut();
-                            sprite.transform.set_position(x, y, 0.0);
+                            sprite.transform.set_position(x as f32, y as f32, 0.0);
                             Return::None
                         }
                     }
@@ -64,9 +64,12 @@ fn main()
     let camera = Camera2D::new(ctx.clone());
     let block = Block::new(ctx.clone(), &mut notifier);
     'main: loop {
+        let (w, h) = ctx.display.get_framebuffer_dimensions();
+    
         for event in ctx.display.poll_events() {
             match event {
-                glutin::Event::Closed => break 'main,
+                Event::Closed => break 'main,
+                Event::MouseMoved(x, y) => notifier.notify(Event::MouseMoved(x, h as i32 - y)),
                 e => notifier.notify(e),
             }
         }
