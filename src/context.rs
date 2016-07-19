@@ -1,6 +1,6 @@
 //! Manage OpenGL context and window.
 use std::string::ToString;
-use glium::{Display, DisplayBuild, Frame};
+use glium::{Display, DisplayBuild, Frame, Surface};
 use glium::glutin::WindowBuilder;
 pub use glium::SwapBuffersError;
 
@@ -30,6 +30,7 @@ impl Context {
         where F: FnOnce(&mut Frame)
     {
         let mut frame = self.display.draw();
+        frame.clear_color(0.0, 0.0, 0.0, 0.0);
         f(&mut frame);
         frame.finish()
     }

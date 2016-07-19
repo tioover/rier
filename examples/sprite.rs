@@ -4,15 +4,13 @@ extern crate image;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::cell::RefCell;
-use glium::Surface;
-use glium::glutin::Event;
 use rier::texture;
 use rier::sprite::Sprite;
 use rier::Context;
 use rier::camera::{Camera, Camera2D};
 use rier::loader::Resource;
 use rier::utils::sleep_ms;
-use rier::event::{Notifier, Return};
+use rier::event::{Notifier, Return, WindowEvent};
 
 
 struct Block {
@@ -20,7 +18,7 @@ struct Block {
 }
 
 impl Block {
-    fn new(ctx: Context, notifier: &mut Notifier<Event>) -> Block {
+    fn new(ctx: Context, notifier: &mut Notifier<WindowEvent>) -> Block {
         let texture = texture::Raw::load(&PathBuf::from("examples/assets/block.png"))
             .unwrap()
             .process(&ctx)
@@ -34,12 +32,12 @@ impl Block {
         block
     }
 
-    fn event_register(&self, notifier: &mut Notifier<Event>) {
+    fn event_register(&self, notifier: &mut Notifier<WindowEvent>) {
         let weak = Rc::downgrade(&self.sprite);
         notifier.register(move |e| {
             println!("{:?}", e);
             match e {
-                &Event::MouseMoved(x, y) => {
+                &WindowEvent::MouseMoved(x, y) => {
                     match weak.upgrade() {
                         None => Return::Dead,
                         Some(sprite) => {
@@ -65,16 +63,15 @@ fn main()
     let block = Block::new(ctx.clone(), &mut notifier);
     'main: loop {
         let (w, h) = ctx.display.get_framebuffer_dimensions();
-    
+
         for event in ctx.display.poll_events() {
             match event {
-                Event::Closed => break 'main,
-                Event::MouseMoved(x, y) => notifier.notify(Event::MouseMoved(x, h as i32 - y)),
+                WindowEvent::Closed => break 'main,
+                WindowEvent::MouseMoved(x, y) => notifier.notify(WindowEvent::MouseMoved(x, h as i32 - y)),
                 e => notifier.notify(e),
             }
         }
         ctx.draw(|mut target| {
-            target.clear_color(0., 0., 0., 0.);
             let cam = camera.matrix();
             block.sprite.borrow().render(&mut target, &renderer, &cam).unwrap();
         }).unwrap();

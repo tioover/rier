@@ -1,9 +1,7 @@
 #[macro_use] extern crate rier;
 #[macro_use] extern crate glium;
 extern crate cgmath;
-use glium::uniforms::EmptyUniforms;
-use glium::Surface;
-use glium::glutin;
+
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -61,13 +59,12 @@ fn main()
 
         for event in ctx.display.poll_events() {
             match event {
-                glutin::Event::Closed => break 'main,
+                rier::event::WindowEvent::Closed => break 'main,
                 _ => (),
             }
         }
         ctx.draw(|mut target| {
-            target.clear_color(0., 0., 0., 0.);
-            let _ = renderer.draw(&mut target, &mesh, &EmptyUniforms).unwrap();
+            let _ = renderer.draw(&mut target, &mesh, &uniform! {}).unwrap();
         }).unwrap();
     }
 }

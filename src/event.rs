@@ -2,6 +2,8 @@
 //!
 //! Use Observer Design Pattern.
 
+pub use glium::glutin::Event as WindowEvent;
+
 
 /// Callback function returns.
 pub enum Return {
