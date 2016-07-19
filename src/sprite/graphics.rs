@@ -1,9 +1,10 @@
-use glium::{Display, Frame, DrawError};
+use glium::{Frame, DrawError};
 use texture;
 use mesh;
 use render;
 use Mat;
 use texture::Rect;
+use context::Context;
 use utils::Cache;
 
 
@@ -68,7 +69,7 @@ impl Graphics {
     }
 
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    fn get_mesh<'a>(&'a self, display: &Display) -> &'a Mesh {
+    fn get_mesh<'a>(&'a self, ctx: &Context) -> &'a Mesh {
         self.mesh_cache.get(|| {
 
             // Generate mash.
@@ -81,7 +82,7 @@ impl Graphics {
                            Vertex::new(width,    0.0, x + w, y + 0),
                            Vertex::new(width, height, x + w, y + h),
                            Vertex::new(  0.0, height, x + 0, y + h)];
-            Mesh::new(display, &verties).unwrap()
+            Mesh::new(&ctx, &verties).unwrap()
         })
     }
 
@@ -101,7 +102,7 @@ impl Graphics {
             camera: *camera,
             transform: *transform,
         };
-        let mesh = self.get_mesh(&renderer.display);
+        let mesh = self.get_mesh(&renderer.context);
         renderer.draw(target, mesh, &uniforms)
     }
 }

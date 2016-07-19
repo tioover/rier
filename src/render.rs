@@ -1,16 +1,19 @@
 //! Object rendering management.
 use std::marker::PhantomData;
-use glium::{Display, Program, DrawParameters, Frame, Surface, Blend, DrawError};
-use glium::program::ProgramCreationError;
+use glium::{Program, DrawParameters, Frame, Surface, Blend};
 use glium::uniforms::Uniforms;
 use mesh::{Mesh, Vertex};
+use context::Context;
+
+pub use glium::DrawError;
+pub use glium::program::ProgramCreationError;
 
 
 /// Rendering context object.
 pub struct Renderer<G>
     where G: Graphics
 {
-    pub display: Display,
+    pub context: Context,
     program: Program,
     params: DrawParameters<'static>,
     _mark: PhantomData<G>,
@@ -19,11 +22,11 @@ pub struct Renderer<G>
 
 impl<G: Graphics> Renderer<G> {
     /// Creates default renderer.
-    pub fn new(display: &Display) -> Result<Renderer<G>, ProgramCreationError> {
-        let program = try!(G::build(display));
+    pub fn new(context: Context) -> Result<Renderer<G>, ProgramCreationError> {
+        let program = try!(G::build(&context));
         let params = G::draw_parameters();
         let renderer = Renderer {
-            display: display.clone(),
+            context: context,
             program: program,
             params: params,
             _mark: PhantomData,
@@ -67,7 +70,7 @@ pub trait Graphics {
     }
 
     /// Builds a program.
-    fn build(display: &Display) -> Result<Program, ProgramCreationError> {
-        Program::from_source(display, Self::vertex(), Self::fragment(), Self::geometry())
+    fn build(ctx: &Context) -> Result<Program, ProgramCreationError> {
+        Program::from_source(&ctx.display, Self::vertex(), Self::fragment(), Self::geometry())
     }
 }

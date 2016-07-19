@@ -1,6 +1,5 @@
 //! Camera.
-
-use glium::Display;
+use context::Context;
 use transform::Transform;
 use Mat;
 
@@ -20,15 +19,15 @@ pub trait Camera {
 ///
 /// Converts screen coordinate to OpenGL world coordinate.
 pub struct Camera2D {
-    display: Display,
+    context: Context,
     transform: Transform,
 }
 
 
 impl Camera2D {
-    pub fn new(display: &Display) -> Camera2D {
+    pub fn new(context: Context) -> Camera2D {
         Camera2D {
-            display: display.clone(),
+            context: context,
             transform: Transform::new(),
         }
     }
@@ -38,8 +37,8 @@ impl Camera2D {
 impl Camera for Camera2D {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     fn matrix(&self) -> Mat {
-        let factor = self.display.get_window().unwrap().hidpi_factor();
-        let (w, h) = self.display.get_framebuffer_dimensions();
+        let factor = self.context.hidpi_factor();
+        let (w, h) = self.context.display.get_framebuffer_dimensions();
         let (w, h) = (w as f32, h as f32);
         let f = factor * 2.0;
         Mat::new(

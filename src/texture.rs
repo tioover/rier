@@ -3,10 +3,10 @@ use std::path::Path;
 use std::rc::Rc;
 use std::ops::Deref;
 use image::{ImageResult, open};
-use glium::Display;
 use glium::texture::{RawImage2d, TextureCreationError, CompressedSrgbTexture2d};
 use glium::uniforms::{AsUniformValue, UniformValue};
 use loader::Resource;
+use context::Context;
 
 
 /// Default texture type.
@@ -18,9 +18,9 @@ pub struct Raw(RawImage2d<'static, u8>);
 
 impl Raw {
     /// Creates texture use data.
-    pub fn process(self, display: &Display) -> Result<Texture, TextureCreationError> {
+    pub fn process(self, ctx: &Context) -> Result<Texture, TextureCreationError> {
         let Raw(image) = self;
-        Texture::new(display, image)
+        Texture::new(&ctx.display, image)
     }
 }
 

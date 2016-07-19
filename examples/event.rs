@@ -1,13 +1,13 @@
 extern crate rier;
 extern crate glium;
 use glium::glutin;
-use rier::utils::{sleep_ms, build_display};
+use rier::utils::sleep_ms;
 use rier::event::{Notifier, Return};
 
 
 fn main()
 {
-    let display = build_display("Event", (800, 600));
+    let ctx = rier::Context::create("Event", (800, 600));
 
     let mut notifier = Notifier::new();
 
@@ -19,7 +19,7 @@ fn main()
 
     'main: loop {
 
-        for event in display.poll_events() {
+        for event in ctx.display.poll_events() {
             match event {
                 glutin::Event::Closed => break 'main,
                 e => notifier.notify(e),

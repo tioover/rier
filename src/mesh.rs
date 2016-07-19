@@ -1,13 +1,14 @@
 //! Polygon mesh.
 
 use glium;
-use glium::Display;
-use glium::{index, vertex};
 use glium::index::{PrimitiveType, NoIndices, IndicesSource};
 use either::{Either, Left, Right};
+use context::Context;
 
 pub use glium::VertexBuffer;
 pub use glium::Vertex;
+pub use glium::index::BufferCreationError as IndexCreationError;
+pub use glium::vertex::BufferCreationError as VertexCreationError;
 
 
 /// Use `u16` represent index data.
@@ -28,9 +29,9 @@ pub struct Mesh<T: Vertex> {
 impl<T: Vertex> Mesh<T> {
     /// Creates a simple mesh object.
     /// Primitive type is triangles list, no indices need.
-    pub fn new(display: &Display, vertices: &[T]) -> Result<Mesh<T>, CreationError> {
+    pub fn new(ctx: &Context, vertices: &[T]) -> Result<Mesh<T>, CreationError> {
         Ok(Mesh {
-            vertices: try!(VertexBuffer::new(display, vertices)),
+            vertices: try!(VertexBuffer::new(&ctx.display, vertices)),
             indices: Right(NoIndices(PrimitiveType::TrianglesList)),
         })
     }
@@ -57,21 +58,21 @@ impl<T: Vertex> Mesh<T> {
 #[derive(Debug)]
 pub enum CreationError {
     /// Vertex buffer create failure.
-    Vertex(vertex::BufferCreationError),
+    Vertex(VertexCreationError),
     /// Index buffer create failure.
-    Index(index::BufferCreationError),
+    Index(IndexCreationError),
 }
 
 
-impl From<index::BufferCreationError> for CreationError {
-    fn from(err: index::BufferCreationError) -> CreationError {
+impl From<IndexCreationError> for CreationError {
+    fn from(err: IndexCreationError) -> CreationError {
         CreationError::Index(err)
     }
 }
 
 
-impl From<vertex::BufferCreationError> for CreationError {
-    fn from(err: vertex::BufferCreationError) -> CreationError {
+impl From<VertexCreationError> for CreationError {
+    fn from(err: VertexCreationError) -> CreationError {
         CreationError::Vertex(err)
     }
 }

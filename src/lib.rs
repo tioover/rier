@@ -11,6 +11,7 @@ extern crate either;
 
 mod id;
 mod transform;
+mod context;
 pub mod event;
 pub mod loader;
 pub mod texture;
@@ -26,5 +27,7 @@ pub type Mat = cgmath::Matrix4<f32>;
 
 
 pub use id::Id;
+pub use mesh::Mesh;
 pub use render::Graphics;
 pub use transform::Transform;
+pub use context::{Context, SwapBuffersError};

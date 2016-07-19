@@ -4,12 +4,13 @@ extern crate image;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::cell::RefCell;
-use glium::{Surface, Display, glutin};
+use glium::{Surface, glutin};
 use rier::texture;
 use rier::sprite::Sprite;
+use rier::Context;
 use rier::camera::{Camera, Camera2D};
 use rier::loader::Resource;
-use rier::utils::{sleep_ms, build_display};
+use rier::utils::sleep_ms;
 use rier::event::{Notifier, Return};
 
 
@@ -18,10 +19,10 @@ struct Block {
 }
 
 impl Block {
-    fn new(display: &Display, notifier: &mut Notifier<glutin::Event>) -> Block {
+    fn new(ctx: Context, notifier: &mut Notifier<glutin::Event>) -> Block {
         let texture = texture::Raw::load(&PathBuf::from("examples/assets/block.png"))
             .unwrap()
-            .process(display)
+            .process(&ctx)
             .unwrap();
         let sprite = Sprite::new(
             &texture::Ref::new(texture),
@@ -57,24 +58,23 @@ impl Block {
 
 fn main()
 {
-    let display = build_display("Sprite", (800, 600));
-    let renderer = rier::render::Renderer::new(&display).unwrap();
+    let ctx = Context::create("Sprite", (800, 600));
+    let renderer = rier::render::Renderer::new(ctx.clone()).unwrap();
     let mut notifier = Notifier::new();
-    let camera = Camera2D::new(&display);
-    let block = Block::new(&display, &mut notifier);
+    let camera = Camera2D::new(ctx.clone());
+    let block = Block::new(ctx.clone(), &mut notifier);
     'main: loop {
-
-        for event in display.poll_events() {
+        for event in ctx.display.poll_events() {
             match event {
                 glutin::Event::Closed => break 'main,
                 e => notifier.notify(e),
             }
         }
-        let mut target = display.draw();
-        target.clear_color(0., 0., 0., 0.);
-        let cam = camera.matrix();
-        block.sprite.borrow().render(&mut target, &renderer, &cam).unwrap();
-        target.finish().unwrap();
+        ctx.draw(|mut target| {
+            target.clear_color(0., 0., 0., 0.);
+            let cam = camera.matrix();
+            block.sprite.borrow().render(&mut target, &renderer, &cam).unwrap();
+        }).unwrap();
         sleep_ms(4);
     }
 }
