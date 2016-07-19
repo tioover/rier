@@ -28,6 +28,16 @@ impl Transform {
         }
     }
 
+    pub fn set_position(&mut self, x: f32, y: f32, z: f32) {
+        self.position = Vector3::new(x, y, z);
+        self.cache.dirty();
+    }
+
+    pub fn set_scale(&mut self, n: f32) {
+        self.scale = n;
+        self.cache.dirty();
+    }
+
     /// Transforms point from local space to world space.
     pub fn apply(&self, point: Vector3<f32>) -> Vector3<f32> {
         self.rotation * &(point * self.scale) + self.position
