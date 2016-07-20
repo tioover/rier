@@ -1,16 +1,16 @@
 extern crate rier;
 extern crate glium;
-extern crate image;
+extern crate sprite;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::cell::RefCell;
 use rier::texture;
-use rier::sprite::Sprite;
-use rier::Context;
+use rier::{Context, WindowEvent};
 use rier::camera::{Camera, Camera2D};
 use rier::loader::Resource;
 use rier::utils::sleep_ms;
-use rier::event::{Notifier, Return, WindowEvent};
+use rier::event::{Notifier, Return};
+use sprite::Sprite;
 
 
 struct Block {
@@ -19,7 +19,7 @@ struct Block {
 
 impl Block {
     fn new(ctx: Context, notifier: &mut Notifier<WindowEvent>) -> Block {
-        let texture = texture::Raw::load(&PathBuf::from("examples/assets/block.png"))
+        let texture = texture::Raw::load(&PathBuf::from("examples/block.png"))
             .unwrap()
             .process(&ctx)
             .unwrap();
@@ -35,7 +35,6 @@ impl Block {
     fn event_register(&self, notifier: &mut Notifier<WindowEvent>) {
         let weak = Rc::downgrade(&self.sprite);
         notifier.register(move |e| {
-            println!("{:?}", e);
             match e {
                 &WindowEvent::MouseMoved(x, y) => {
                     match weak.upgrade() {
@@ -67,14 +66,15 @@ fn main()
         for event in ctx.display.poll_events() {
             match event {
                 WindowEvent::Closed => break 'main,
-                WindowEvent::MouseMoved(x, y) => notifier.notify(WindowEvent::MouseMoved(x, h as i32 - y)),
+                WindowEvent::MouseMoved(x, y) =>
+                    notifier.notify(WindowEvent::MouseMoved(x, h as i32 - y)),
                 e => notifier.notify(e),
             }
         }
         ctx.draw(|mut target| {
             let cam = camera.matrix();
             block.sprite.borrow().render(&mut target, &renderer, &cam).unwrap();
-        }).unwrap();
+        });
         sleep_ms(4);
     }
 }

@@ -1,10 +1,20 @@
 //! Component that describes the transform of object.
+
 use num::Zero;
 use cgmath::{Vector3, Matrix4, Basis3, Quaternion};
 use utils::Cache;
 use Mat;
 
 /// Position, rotation and scale of an object.
+/// # Example
+///
+/// ```
+/// use rier::Transform;
+///
+/// let mut transform = Transform::new();
+/// transform.set_position(100.0, 100.0, 0.0);
+/// let _ = transform.matrix();
+/// ```
 pub struct Transform {
     /// Ojbect scale, default `1`.
     pub scale: f32,
@@ -17,8 +27,7 @@ pub struct Transform {
 
 
 impl Transform {
-    //! Creates an empty transform.
-    //! Corresponding with unit matrix.
+    /// Creates an empty transform.
     pub fn new() -> Transform {
         Transform {
             scale: 1.0,
@@ -28,11 +37,13 @@ impl Transform {
         }
     }
 
+    /// Sets transform position.
     pub fn set_position(&mut self, x: f32, y: f32, z: f32) {
         self.position = Vector3::new(x, y, z);
         self.cache.dirty();
     }
 
+    /// Sets transform scale.
     pub fn set_scale(&mut self, n: f32) {
         self.scale = n;
         self.cache.dirty();

@@ -1,4 +1,4 @@
-//! [Rier](https://github.com/tioover/rier) is a simple graphics rendering library.
+//! A simple graphics rendering library.
 extern crate num;
 extern crate cgmath;
 #[macro_use]
@@ -19,7 +19,6 @@ pub mod mesh;
 pub mod camera;
 pub mod render;
 pub mod utils;
-pub mod sprite;
 
 
 /// 4x4 float matrix.
@@ -31,3 +30,4 @@ pub use mesh::Mesh;
 pub use render::Graphics;
 pub use transform::Transform;
 pub use context::{Context, SwapBuffersError};
+pub use glium::glutin::Event as WindowEvent;

@@ -2,15 +2,15 @@
 //!
 //! Use Observer Design Pattern.
 
-pub use glium::glutin::Event as WindowEvent;
-
 
 /// Callback function returns.
-pub enum Return {
+pub enum Return<E> {
     /// Nothing.
     None,
     /// The callback will be moved.
     Dead,
+    Abord,
+    Spwan(Box<E>),
 }
 
 /// Event sender.
@@ -25,7 +25,7 @@ pub enum Return {
 /// notifier.notify(42i32);
 /// ```
 pub struct Notifier<E> {
-    subscribers: Vec<Box<Fn(&E) -> Return>>,
+    subscribers: Vec<Box<Fn(&E) -> Return<E>>>,
 }
 
 
@@ -36,7 +36,7 @@ impl<E> Notifier<E> {
 
     /// Register event callback function.
     pub fn register<F>(&mut self, callback: F)
-        where F: 'static + Fn(&E) -> Return
+        where F: 'static + Fn(&E) -> Return<E>
     {
         self.subscribers.push(Box::new(callback));
     }
@@ -46,7 +46,8 @@ impl<E> Notifier<E> {
         self.subscribers.retain(|f| {
             match f(&event) {
                 Return::Dead => false,
-                _ => true,
+                Return::None => true,
+                _ => unimplemented!(),
             }
         })
     }

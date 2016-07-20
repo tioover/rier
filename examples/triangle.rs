@@ -59,12 +59,12 @@ fn main()
 
         for event in ctx.display.poll_events() {
             match event {
-                rier::event::WindowEvent::Closed => break 'main,
+                rier::WindowEvent::Closed => break 'main,
                 _ => (),
             }
         }
         ctx.draw(|mut target| {
-            let _ = renderer.draw(&mut target, &mesh, &uniform! {}).unwrap();
-        }).unwrap();
+            renderer.draw(&mut target, &mesh, &uniform! {}).unwrap();
+        });
     }
 }

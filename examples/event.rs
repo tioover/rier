@@ -1,7 +1,7 @@
 extern crate rier;
 extern crate glium;
 use rier::utils::sleep_ms;
-use rier::event::{Notifier, Return, WindowEvent};
+use rier::event::{Notifier, Return};
 
 
 fn main()
@@ -20,7 +20,7 @@ fn main()
 
         for event in ctx.display.poll_events() {
             match event {
-                WindowEvent::Closed => break 'main,
+                rier::WindowEvent::Closed => break 'main,
                 e => notifier.notify(e),
             }
         }

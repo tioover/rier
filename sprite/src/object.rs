@@ -1,10 +1,6 @@
-use glium::{Frame, DrawError};
-use Id;
-use Mat;
-use Transform;
-use texture;
-use render;
-use sprite::graphics::Graphics;
+use rier::{Mat, Id, Transform, texture};
+use rier::render::{Frame, DrawError, Renderer};
+use graphics::Graphics;
 
 
 /// Sprite game object.
@@ -26,7 +22,7 @@ impl Sprite {
 
     pub fn render(&self,
                   target: &mut Frame,
-                  renderer: &render::Renderer<Graphics>,
+                  renderer: &Renderer<Graphics>,
                   camera: &Mat)
                   -> Result<(), DrawError> {
         self.graphics.render(target, renderer, camera, self.transform.matrix())

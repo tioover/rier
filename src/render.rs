@@ -1,11 +1,11 @@
 //! Object rendering management.
 use std::marker::PhantomData;
-use glium::{Program, DrawParameters, Frame, Surface, Blend};
+use glium::{Program, DrawParameters, Surface, Blend};
 use glium::uniforms::Uniforms;
 use mesh::{Mesh, Vertex};
 use context::Context;
 
-pub use glium::DrawError;
+pub use glium::{Frame, DrawError};
 pub use glium::program::ProgramCreationError;
 
 
@@ -71,6 +71,9 @@ pub trait Graphics {
 
     /// Builds a program.
     fn build(ctx: &Context) -> Result<Program, ProgramCreationError> {
-        Program::from_source(&ctx.display, Self::vertex(), Self::fragment(), Self::geometry())
+        Program::from_source(&ctx.display,
+                             Self::vertex(),
+                             Self::fragment(),
+                             Self::geometry())
     }
 }

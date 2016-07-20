@@ -15,6 +15,7 @@ cargo build
 ### Example
 
 ```
+cd sprite
 cargo run --example sprite
 ```
 

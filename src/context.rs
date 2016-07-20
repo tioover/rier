@@ -9,7 +9,9 @@ pub use glium::SwapBuffersError;
 ///
 /// Proxy of `glium::Display`.
 #[derive(Clone)]
-pub struct Context { pub display: Display }
+pub struct Context {
+    pub display: Display,
+}
 
 
 impl Context {
@@ -20,22 +22,21 @@ impl Context {
             .with_dimensions(width, height)
             .build_glium()
             .unwrap();
-        Context {
-            display: display,
-        }
+        Context { display: display }
     }
 
     /// Start draw a new frame.
-    pub fn draw<F>(&self, f: F) -> Result<(), SwapBuffersError>
+    pub fn draw<F>(&self, f: F)
         where F: FnOnce(&mut Frame)
     {
         let mut frame = self.display.draw();
         frame.clear_color(0.0, 0.0, 0.0, 0.0);
         f(&mut frame);
-        frame.finish()
+        frame.finish().unwrap();
     }
 
-    /// Returns the ratio between the backing framebuffer resolution and the window size in screen pixels.
+    /// Returns the ratio between the backing framebuffer resolution
+    /// and the window size in screen pixels.
     pub fn hidpi_factor(&self) -> f32 {
         self.display.get_window().unwrap().hidpi_factor()
     }

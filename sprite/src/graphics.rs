@@ -1,11 +1,8 @@
-use glium::{Frame, DrawError};
-use texture;
-use mesh;
-use render;
-use Mat;
-use texture::Rect;
-use context::Context;
-use utils::Cache;
+use rier::{Context, Mat, texture, mesh};
+use rier::render;
+use rier::render::{Frame, DrawError, Renderer};
+use rier::texture::Rect;
+use rier::utils::Cache;
 
 
 type Mesh = mesh::Mesh<Vertex>;
@@ -89,7 +86,7 @@ impl Graphics {
     /// Renders this sprite.
     pub fn render(&self,
                   target: &mut Frame,
-                  renderer: &render::Renderer<Self>,
+                  renderer: &Renderer<Self>,
                   camera: &Mat,
                   transform: &Mat)
                   -> Result<(), DrawError> {
