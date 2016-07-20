@@ -2,7 +2,6 @@
 use std::string::ToString;
 use glium::{Display, DisplayBuild, Frame, Surface};
 use glium::glutin::WindowBuilder;
-pub use glium::SwapBuffersError;
 
 
 /// Context handle object.

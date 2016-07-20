@@ -29,5 +29,5 @@ pub use id::Id;
 pub use mesh::Mesh;
 pub use render::Graphics;
 pub use transform::Transform;
-pub use context::{Context, SwapBuffersError};
+pub use context::Context;
 pub use glium::glutin::Event as WindowEvent;
