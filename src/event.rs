@@ -1,7 +1,16 @@
 //! Event notification system.
 //!
-//! Use Observer Design Pattern.
-
+//! Use the observer design pattern.
+//!
+//! # Example
+//!
+//! ```
+//! use rier::event::{Notifier, Return};
+//!
+//! let mut notifier = Notifier::<i32>::new();
+//! notifier.register(|e| { assert_eq!(e, &42); Return::None });
+//! notifier.notify(42);
+//! ```
 
 /// Callback function returns.
 pub enum Return<E> {
@@ -9,21 +18,14 @@ pub enum Return<E> {
     None,
     /// The callback will be moved.
     Dead,
+    /// Stop notify this event.
     Abord,
+    /// Start notify this new event.
     Spwan(Box<E>),
 }
 
 /// Event sender.
-///
-/// # Example
-///
-/// ```
-/// use rier::event::{Notifier, Return};
-///
-/// let mut notifier = Notifier::new();
-/// notifier.register(|e| {assert_eq!(e, &42i32); Return::None});
-/// notifier.notify(42i32);
-/// ```
+
 pub struct Notifier<E> {
     subscribers: Vec<Box<Fn(&E) -> Return<E>>>,
 }

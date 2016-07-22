@@ -1,43 +1,43 @@
 //! Utility functions.
 use std::cell::UnsafeCell;
-use num::NumCast;
+// use num::NumCast;
+use cgmath::Matrix4;
 
 
-/// Number types cast function.
+/// 4x4 float matrix.
+pub type Matrix = Matrix4<f32>;
+
+
+// /// Number types cast function.
+// #[inline]
+// pub fn cast<T, U>(x: T) -> U
+//     where T: NumCast,
+//           U: NumCast
+// {
+//     U::from(x).unwrap()
+// }
+
+
+// /// Puts the current thread to sleep for the specified amount of milliseconds.
+// pub fn sleep_ms(ms: u32) {
+//     use std::thread::sleep;
+//     use std::time::Duration;
+//     sleep(Duration::from_millis(ms as u64));
+// }
+
+
+/// A object that cache the data.
 /// # Example
 ///
 /// ```
-/// use rier::utils::cast;
+/// use rier::Cache;
 ///
-/// fn foobar(x: u32) {}
+/// let mut cache = Cache::<&'static str>::new();
 ///
-/// foobar(cast(42i32));
-/// ```
-#[inline]
-pub fn cast<T, U>(x: T) -> U
-    where T: NumCast,
-          U: NumCast
-{
-    U::from(x).unwrap()
-}
-
-
-/// Puts the current thread to sleep for the specified amount of milliseconds.
-pub fn sleep_ms(ms: u32) {
-    use std::thread::sleep;
-    use std::time::Duration;
-    sleep(Duration::from_millis(ms as u64));
-}
-
-
-/// Cache cell.
-/// # Example
-///
-/// ```
-/// use rier::utils::Cache;
-///
-/// let cache = Cache::new();
-/// assert_eq!(cache.get(|| 42i32), &42i32);
+/// assert_eq!(cache.get(|| "Madoka"), &"Madoka");
+/// assert_eq!(cache.get(|| "Homura"), &"Madoka"); // Nothing change.
+/// cache.dirty(); // Make data dirty.
+/// assert_eq!(cache.get(|| "Homura"), &"Homura");
 /// ```
 pub struct Cache<T> {
     data: UnsafeCell<Option<T>>,
@@ -45,18 +45,18 @@ pub struct Cache<T> {
 
 
 impl<T> Cache<T> {
-    /// Creates a empty cache object.
+    /// Creates a empty cache cell.
     pub fn new() -> Cache<T> {
         Cache { data: UnsafeCell::new(None) }
     }
 
-    /// Mark data dirty.
+    /// Mark the data should be updated.
     pub fn dirty(&mut self) {
         self.data = UnsafeCell::new(None)
     }
 
-    /// Gets cached object, If object is uninitialized, initialize it first.
-    pub fn get<'a, F>(&'a self, builder: F) -> &'a T
+    /// Gets cached object, If the object has not been cached, creates it first.
+    pub fn get<F>(&self, builder: F) -> &T
         where F: FnOnce() -> T
     {
         unsafe {
@@ -66,5 +66,31 @@ impl<T> Cache<T> {
             }
             cache.as_ref().unwrap()
         }
+    }
+
+    /// Returns reference only if data not dirty.
+    pub fn try_get(&self) -> Option<&T> {
+        unsafe { self.data.get().as_ref().unwrap().as_ref() }
+    }
+
+    /// Consumes and returning the wrapped value.
+    pub fn unwrap(self) -> Option<T> {
+        unsafe { self.data.into_inner() }
+    }
+}
+
+
+pub trait AsMatrix {
+    fn matrix(&self) -> &Matrix;
+
+    fn array(&self) -> &[[f32; 4]; 4] {
+        self.matrix().as_ref()
+    }
+}
+
+
+impl AsMatrix for Matrix {
+    fn matrix(&self) -> &Matrix {
+        self
     }
 }

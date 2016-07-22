@@ -1,4 +1,4 @@
-use rier::{Mat, Id, Transform, texture};
+use rier::{Id, Transform, Camera2D, texture};
 use rier::render::{Frame, DrawError, Renderer};
 use graphics::Graphics;
 
@@ -23,8 +23,8 @@ impl Sprite {
     pub fn render(&self,
                   target: &mut Frame,
                   renderer: &Renderer<Graphics>,
-                  camera: &Mat)
+                  camera: &Camera2D)
                   -> Result<(), DrawError> {
-        self.graphics.render(target, renderer, camera, self.transform.matrix())
+        self.graphics.render(target, renderer, camera, &self.transform)
     }
 }

@@ -1,14 +1,12 @@
 extern crate rier;
-extern crate glium;
 extern crate sprite;
+
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::cell::RefCell;
 use rier::texture;
-use rier::{Context, WindowEvent};
-use rier::camera::{Camera, Camera2D};
+use rier::{Context, WindowEvent, Camera2D};
 use rier::loader::Resource;
-use rier::utils::sleep_ms;
 use rier::event::{Notifier, Return};
 use sprite::Sprite;
 
@@ -58,10 +56,11 @@ fn main()
     let ctx = Context::create("Sprite", (800, 600));
     let renderer = rier::render::Renderer::new(ctx.clone()).unwrap();
     let mut notifier = Notifier::new();
-    let camera = Camera2D::new(ctx.clone());
+    let mut camera = Camera2D::new(ctx.clone());
     let block = Block::new(ctx.clone(), &mut notifier);
     'main: loop {
-        let (w, h) = ctx.display.get_framebuffer_dimensions();
+        let (_, h) = ctx.display.get_framebuffer_dimensions();
+        camera.update();
 
         for event in ctx.display.poll_events() {
             match event {
@@ -71,10 +70,12 @@ fn main()
                 e => notifier.notify(e),
             }
         }
+
         ctx.draw(|mut target| {
-            let cam = camera.matrix();
-            block.sprite.borrow().render(&mut target, &renderer, &cam).unwrap();
+            block.sprite.borrow().render(&mut target, &renderer, &camera).unwrap();
+
         });
-        sleep_ms(4);
+
+
     }
 }

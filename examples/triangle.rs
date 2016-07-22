@@ -2,6 +2,8 @@
 #[macro_use] extern crate glium;
 extern crate cgmath;
 
+use rier::{AsMatrix, Camera3D};
+
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -20,12 +22,13 @@ impl rier::Graphics for Graphics {
     fn vertex() -> &'static str {
 r#"
 #version 140
+uniform mat4 matrix;
 in vec2 position;
 in vec3 color;
 out vec3 vColor;
 void main()
 {
-    gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = matrix * vec4(position, 0.0, 1.0);
     vColor = color;
 }
 "#
@@ -50,13 +53,14 @@ fn main()
 {
     let ctx = rier::Context::create("Triangle", (800, 600));
     let renderer = rier::render::Renderer::<Graphics>::new(ctx.clone()).unwrap();
+    let mut camera = Camera3D::new(ctx.clone());
     let mesh = rier::Mesh::new(&ctx, &[
             Vertex { position: [-1.0, -1.0], color: [0.0, 1.0, 0.0] },
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
             Vertex { position: [ 1.0, -1.0], color: [1.0, 0.0, 0.0] },
         ]).unwrap();
     'main: loop {
-
+        camera.update();
         for event in ctx.display.poll_events() {
             match event {
                 rier::WindowEvent::Closed => break 'main,
@@ -64,7 +68,7 @@ fn main()
             }
         }
         ctx.draw(|mut target| {
-            renderer.draw(&mut target, &mesh, &uniform! {}).unwrap();
+            renderer.draw(&mut target, &mesh, &uniform! { matrix: *camera.array() }).unwrap();
         });
     }
 }

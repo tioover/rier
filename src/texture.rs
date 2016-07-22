@@ -48,8 +48,11 @@ impl Ref {
 
 
 impl AsUniformValue for Ref {
-    fn as_uniform_value(&self) -> UniformValue {
-        UniformValue::CompressedSrgbTexture2d(&*self, None)
+    fn as_uniform_value<'a>(&'a self) -> UniformValue<'a> {
+        use std::mem::transmute;
+        let &Ref(ref tex) = self;
+        // type system issue.
+        unsafe { transmute(tex.deref().as_uniform_value()) }
     }
 }
 

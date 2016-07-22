@@ -11,7 +11,7 @@ pub use glium::index::BufferCreationError as IndexCreationError;
 pub use glium::vertex::BufferCreationError as VertexCreationError;
 
 
-/// Use `u16` represent index data.
+/// A integer represent the vertex index.
 pub type Index = u16;
 /// A list of indices loaded in the graphics card's memory.
 pub type IndexBuffer = glium::IndexBuffer<Index>;
@@ -29,10 +29,22 @@ pub struct Mesh<T: Vertex> {
 impl<T: Vertex> Mesh<T> {
     /// Creates a simple mesh object.
     /// Primitive type is triangles list, no indices need.
-    pub fn new(ctx: &Context, vertices: &[T]) -> Result<Mesh<T>, CreationError> {
+    pub fn new(ctx: &Context, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError> {
         Ok(Mesh {
             vertices: try!(VertexBuffer::new(&ctx.display, vertices)),
             indices: Right(NoIndices(PrimitiveType::TrianglesList)),
+        })
+    }
+
+    pub fn with_indices(ctx: &Context,
+                        vertices: &[T],
+                        indices: &[Index])
+                        -> Result<Mesh<T>, CreationError> {
+        Ok(Mesh {
+            vertices: try!(VertexBuffer::new(&ctx.display, vertices)),
+            indices: Left(try!(IndexBuffer::new(&ctx.display,
+                                                PrimitiveType::TrianglesList,
+                                                indices))),
         })
     }
 
@@ -54,7 +66,7 @@ impl<T: Vertex> Mesh<T> {
 }
 
 
-/// Errors which can occur when attempting to create a Mesh.
+/// Errors which can occur when attempting to create a mesh.
 #[derive(Debug)]
 pub enum CreationError {
     /// Vertex buffer create failure.

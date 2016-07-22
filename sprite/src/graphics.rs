@@ -1,8 +1,6 @@
-use rier::{Context, Mat, texture, mesh};
+use rier::{Context, Transform, Camera2D, AsMatrix, Cache, texture, mesh};
 use rier::render;
 use rier::render::{Frame, DrawError, Renderer};
-use rier::texture::Rect;
-use rier::utils::Cache;
 
 
 type Mesh = mesh::Mesh<Vertex>;
@@ -48,27 +46,27 @@ pub struct Graphics {
     width: f32,
     height: f32,
     texture: texture::Ref,
-    texture_rect: Rect,
+    texture_rect: texture::Rect,
     mesh_cache: Cache<Mesh>,
 }
 
 impl Graphics {
-    #[doc(hidden)]
-    pub fn new(tex: &texture::Ref, tex_rect: Rect, width: f32, height: f32) -> Graphics {
+    pub fn new(texture: &texture::Ref, tex_rect: texture::Rect, width: f32, height: f32)
+        -> Graphics
+    {
         Graphics {
             texture_rect: tex_rect,
             width: width,
             height: height,
-            texture: tex.clone(),
+            texture: texture.clone(),
             opacity: 1.0,
             mesh_cache: Cache::new(),
         }
     }
 
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    fn get_mesh<'a>(&'a self, ctx: &Context) -> &'a Mesh {
+    fn get_mesh<'a>(&'a self, context: &Context) -> &'a Mesh {
         self.mesh_cache.get(|| {
-
             // Generate mash.
             let (width, height) = (self.width, self.height);
             let (w, h) = (self.texture_rect.w as i32, self.texture_rect.h as i32);
@@ -76,10 +74,9 @@ impl Graphics {
             let verties = [Vertex::new(  0.0, height, x + 0, y + h),
                            Vertex::new(  0.0,    0.0, x + 0, y + 0),
                            Vertex::new(width,    0.0, x + w, y + 0),
-                           Vertex::new(width,    0.0, x + w, y + 0),
-                           Vertex::new(width, height, x + w, y + h),
-                           Vertex::new(  0.0, height, x + 0, y + h)];
-            Mesh::new(&ctx, &verties).unwrap()
+                           Vertex::new(width, height, x + w, y + h),];
+            let indices = [0, 1, 2, 3, 2, 0];
+            Mesh::with_indices(context, &verties, &indices).unwrap()
         })
     }
 
@@ -87,11 +84,14 @@ impl Graphics {
     pub fn render(&self,
                   target: &mut Frame,
                   renderer: &Renderer<Self>,
-                  camera: &Mat,
-                  transform: &Mat)
+                  camera: &Camera2D,
+                  transform: &Transform)
                   -> Result<(), DrawError> {
-        let camera: &[[_; 4]; 4] = camera.as_ref();
-        let transform: &[[_; 4]; 4] = transform.as_ref();
+
+
+        let camera = camera.array();
+        let transform = transform.array();
+
         let uniforms = uniform!
         {
             tex: self.texture.clone(),
@@ -99,6 +99,7 @@ impl Graphics {
             camera: *camera,
             transform: *transform,
         };
+
         let mesh = self.get_mesh(&renderer.context);
         renderer.draw(target, mesh, &uniforms)
     }

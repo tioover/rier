@@ -10,24 +10,23 @@ extern crate either;
 
 
 mod id;
-mod transform;
 mod context;
+mod utils;
+pub mod transform;
+pub mod camera;
 pub mod event;
 pub mod loader;
 pub mod texture;
 pub mod mesh;
-pub mod camera;
 pub mod render;
-pub mod utils;
 
-
-/// 4x4 float matrix.
-pub type Mat = cgmath::Matrix4<f32>;
 
 
 pub use id::Id;
 pub use mesh::Mesh;
 pub use render::Graphics;
+pub use camera::{Camera2D, Camera3D};
 pub use transform::Transform;
 pub use context::Context;
 pub use glium::glutin::Event as WindowEvent;
+pub use utils::{Matrix, AsMatrix, Cache};

@@ -1,6 +1,5 @@
 extern crate rier;
 extern crate glium;
-use rier::utils::sleep_ms;
 use rier::event::{Notifier, Return};
 
 
@@ -24,6 +23,5 @@ fn main()
                 e => notifier.notify(e),
             }
         }
-        sleep_ms(4);
     }
 }
