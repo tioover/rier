@@ -1,11 +1,12 @@
 extern crate rier;
 extern crate glium;
 use rier::event::{Notifier, Return};
+use rier::{Gfx, Context};
 
 
 fn main()
 {
-    let ctx = rier::Context::create("Event", (800, 600));
+    let gfx = Context::create("Event", (800, 600)).gfx();
 
     let mut notifier = Notifier::new();
 
@@ -17,7 +18,7 @@ fn main()
 
     'main: loop {
 
-        for event in ctx.display.poll_events() {
+        for event in gfx.display.poll_events() {
             match event {
                 rier::WindowEvent::Closed => break 'main,
                 e => notifier.notify(e),

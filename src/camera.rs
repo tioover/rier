@@ -1,7 +1,7 @@
 //! Camera.
 use num::One;
 use cgmath::{Ortho, PerspectiveFov, Rad, Deg, deg, Point3, vec3};
-use context::Context;
+use context::Gfx;
 use transform::Transform;
 use utils::AsMatrix;
 use Matrix;
@@ -11,25 +11,25 @@ use Matrix;
 ///
 /// Converts screen coordinate to OpenGL world coordinate.
 pub struct Camera2D {
-    context: Context,
+    gfx: Gfx,
     transform: Transform,
     matrix: Matrix,
 }
 
 
 impl Camera2D {
-    pub fn new(context: Context) -> Camera2D {
+    pub fn new(gfx: Gfx) -> Camera2D {
         let transform = Transform::new();
 
         Camera2D {
-            matrix: Camera2D::build_matrix(&context, transform.matrix()),
-            context: context,
+            matrix: Camera2D::build_matrix(&gfx, transform.matrix()),
+            gfx: gfx,
             transform: transform,
         }
     }
 
-    fn build_matrix(context: &Context, transform: &Matrix) -> Matrix {
-        let (w, h) = context.display.get_framebuffer_dimensions();
+    fn build_matrix(gfx: &Gfx, transform: &Matrix) -> Matrix {
+        let (w, h) = gfx.display.get_framebuffer_dimensions();
         let ortho = Ortho {
             left: 0.0,
             right: w as f32,
@@ -42,7 +42,7 @@ impl Camera2D {
     }
 
     pub fn update(&mut self) {
-        self.matrix = Camera2D::build_matrix(&self.context, self.transform.matrix());
+        self.matrix = Camera2D::build_matrix(&self.gfx, self.transform.matrix());
     }
 }
 
@@ -55,7 +55,7 @@ impl AsMatrix for Camera2D {
 
 
 pub struct Camera3D {
-    context: Context,
+    gfx: Gfx,
     pub pov: Deg<f32>,
     pub near: f32,
     pub far: f32,
@@ -66,9 +66,9 @@ pub struct Camera3D {
 
 
 impl Camera3D {
-    pub fn new(context: Context) -> Camera3D {
+    pub fn new(gfx: Gfx) -> Camera3D {
         let mut camera = Camera3D {
-            context: context,
+            gfx: gfx,
             pov: deg(45.0),
             near: 0.1,
             far: 100.0,
@@ -92,7 +92,7 @@ impl Camera3D {
     }
 
     fn aspect(&self) -> f32 {
-        let (w, h) = self.context.display.get_framebuffer_dimensions();
+        let (w, h) = self.gfx.display.get_framebuffer_dimensions();
         w as f32 / h as f32
     }
 

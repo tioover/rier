@@ -1,15 +1,42 @@
 //! Manage OpenGL context and window.
 use std::string::ToString;
-use glium::{Display, DisplayBuild, Frame, Surface};
+use std::rc::Rc;
+use std::ops::Deref;
+use std::cell::{UnsafeCell, RefCell, RefMut, Ref};
+use glium::{Display, DisplayBuild};
 use glium::glutin::WindowBuilder;
+
+pub use glium::{Frame, Surface, SwapBuffersError, DrawError};
+
+
+/// Just a reference of `Context`.
+#[derive(Clone)]
+pub struct Gfx(Rc<Context>);
+
+
+impl Gfx {
+    pub fn new(ctx: Context) -> Gfx {
+        Gfx(Rc::new(ctx))
+    }
+}
+
+
+impl Deref for Gfx {
+    type Target = Context;
+
+    fn deref(&self) -> &Context {
+        &*self.0
+    }
+}
 
 
 /// Context handle object.
 ///
-/// Proxy of `glium::Display`.
-#[derive(Clone)]
+/// Manage `glium::Display` context and current frame.
 pub struct Context {
     pub display: Display,
+    frame: UnsafeCell<Option<RefCell<Frame>>>,
+    clear_color: (f32, f32, f32, f32),
 }
 
 
@@ -21,17 +48,94 @@ impl Context {
             .with_dimensions(width, height)
             .build_glium()
             .unwrap();
-        Context { display: display }
+        Context {
+            display: display,
+            frame: UnsafeCell::new(None),
+            clear_color: (0.0, 0.0, 0.0, 0.0),
+        }
     }
 
-    /// Start draw a new frame.
-    pub fn draw<F>(&self, f: F)
-        where F: FnOnce(&mut Frame)
+    /// Sets clear color.
+    pub fn clear_color(self, r: f32, g: f32, b: f32, a: f32) -> Context {
+        Context { clear_color: (r, g, b, a), ..self }
+    }
+
+    /// Into be a reference.
+    pub fn gfx(self) -> Gfx {
+        Gfx::new(self)
+    }
+
+    unsafe fn get_cell(&self) -> &mut Option<RefCell<Frame>> {
+        self.frame.get().as_mut().unwrap()
+    }
+
+    /// Start a new frame.
+    pub fn start_frame(&self) {
+        unsafe {
+            let mut cell = self.get_cell();
+            if cell.is_some() {
+                println!("Frame has already started.");
+            } else {
+                let mut frame = self.display.draw();
+                let (r, g, b, a) = self.clear_color;
+                frame.clear_color(r, g, b, a);
+                *cell = Some(RefCell::new(frame));
+            }
+        }
+    }
+
+
+    /// Get frame immutable reference.
+    /// # Panics
+    /// Panic if frame not created or something is mutable borrowing the frame.
+    pub fn get_frame(&self) -> Ref<Frame> {
+        unsafe {
+            let cell = self.get_cell();
+            if cell.is_none() {
+                panic!("Frame not exist.")
+            }
+            cell.as_ref().unwrap().borrow()
+        }
+    }
+
+    /// Get frame mutable reference.
+    /// # Panics
+    /// Panic if something is borrowing the frame.
+    pub fn get_frame_mut(&self) -> RefMut<Frame> {
+        unsafe {
+            let cell = self.get_cell();
+            if cell.is_none() {
+                panic!("Frame not exist.")
+            }
+            cell.as_ref().unwrap().borrow_mut()
+        }
+    }
+
+    /// End the frame.
+    pub fn end_frame(&self) -> Result<(), SwapBuffersError> {
+        unsafe {
+            let mut cell = self.get_cell();
+            if cell.is_none() {
+                println!("Frame has already ended.");
+                Ok(())
+            } else {
+                // Test whether the frame is borrowed.
+                // TODO: Waiting `borrow_state` stabilization:
+                // https://github.com/rust-lang/rust/issues/27733
+                let _ = cell.as_ref().unwrap().borrow_mut();
+                let frame = cell.take().unwrap().into_inner();
+                frame.finish()
+            }
+        }
+    }
+
+    /// Start a new frame and auto end it.
+    pub fn frame<F>(&self, f: F) -> Result<(), SwapBuffersError>
+        where F: FnOnce()
     {
-        let mut frame = self.display.draw();
-        frame.clear_color(0.0, 0.0, 0.0, 0.0);
-        f(&mut frame);
-        frame.finish().unwrap();
+        self.start_frame();
+        f();
+        self.end_frame()
     }
 
     /// Returns the ratio between the backing framebuffer resolution

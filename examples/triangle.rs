@@ -2,7 +2,7 @@
 #[macro_use] extern crate glium;
 extern crate cgmath;
 
-use rier::{AsMatrix, Camera3D};
+use rier::{Gfx, Context, AsMatrix, Camera3D};
 
 
 #[derive(Copy, Clone)]
@@ -51,24 +51,24 @@ void main()
 
 fn main()
 {
-    let ctx = rier::Context::create("Triangle", (800, 600));
-    let renderer = rier::render::Renderer::<Graphics>::new(ctx.clone()).unwrap();
-    let mut camera = Camera3D::new(ctx.clone());
-    let mesh = rier::Mesh::new(&ctx, &[
+    let gfx = Context::create("Triangle", (800, 600)).gfx();
+    let renderer = rier::render::Renderer::<Graphics>::new(gfx.clone()).unwrap();
+    let mut camera = Camera3D::new(gfx.clone());
+    let mesh = rier::Mesh::new(&gfx, &[
             Vertex { position: [-1.0, -1.0], color: [0.0, 1.0, 0.0] },
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
             Vertex { position: [ 1.0, -1.0], color: [1.0, 0.0, 0.0] },
         ]).unwrap();
     'main: loop {
         camera.update();
-        for event in ctx.display.poll_events() {
+        for event in gfx.display.poll_events() {
             match event {
                 rier::WindowEvent::Closed => break 'main,
                 _ => (),
             }
         }
-        ctx.draw(|mut target| {
-            renderer.draw(&mut target, &mesh, &uniform! { matrix: *camera.array() }).unwrap();
-        });
+        gfx.frame(|| {
+            renderer.draw(&mesh, &uniform! { matrix: *camera.array() }).unwrap();
+        }).unwrap();
     }
 }

@@ -2,8 +2,9 @@
 
 use glium;
 use glium::index::{PrimitiveType, NoIndices, IndicesSource};
+use glium::vertex::{IntoVerticesSource, VerticesSource};
 use either::{Either, Left, Right};
-use context::Context;
+use context::Gfx;
 
 pub use glium::VertexBuffer;
 pub use glium::Vertex;
@@ -29,20 +30,20 @@ pub struct Mesh<T: Vertex> {
 impl<T: Vertex> Mesh<T> {
     /// Creates a simple mesh object.
     /// Primitive type is triangles list, no indices need.
-    pub fn new(ctx: &Context, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError> {
+    pub fn new(gfx: &Gfx, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError> {
         Ok(Mesh {
-            vertices: try!(VertexBuffer::new(&ctx.display, vertices)),
+            vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
             indices: Right(NoIndices(PrimitiveType::TrianglesList)),
         })
     }
 
-    pub fn with_indices(ctx: &Context,
+    pub fn with_indices(gfx: &Gfx,
                         vertices: &[T],
                         indices: &[Index])
                         -> Result<Mesh<T>, CreationError> {
         Ok(Mesh {
-            vertices: try!(VertexBuffer::new(&ctx.display, vertices)),
-            indices: Left(try!(IndexBuffer::new(&ctx.display,
+            vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
+            indices: Left(try!(IndexBuffer::new(&gfx.display,
                                                 PrimitiveType::TrianglesList,
                                                 indices))),
         })
@@ -55,13 +56,22 @@ impl<T: Vertex> Mesh<T> {
             indices: Left(indices),
         }
     }
+}
 
-    #[doc(hidden)]
-    pub fn indices_source(&self) -> IndicesSource {
+
+impl<'a, T: Vertex> Into<IndicesSource<'a>> for &'a Mesh<T> {
+    fn into(self) -> IndicesSource<'a> {
         match self.indices {
             Left(ref x) => x.into(),
             Right(ref x) => x.into(),
         }
+    }
+}
+
+
+impl<'a, T: Vertex> IntoVerticesSource<'a> for &'a Mesh<T> {
+    fn into_vertices_source(self) -> VerticesSource<'a> {
+        self.vertices.into_vertices_source()
     }
 }
 

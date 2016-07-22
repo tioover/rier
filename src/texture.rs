@@ -6,7 +6,7 @@ use image::{ImageResult, open};
 use glium::texture::{RawImage2d, TextureCreationError, CompressedSrgbTexture2d};
 use glium::uniforms::{AsUniformValue, UniformValue};
 use loader::Resource;
-use context::Context;
+use context::Gfx;
 
 
 /// Default texture type.
@@ -18,7 +18,7 @@ pub struct Raw(RawImage2d<'static, u8>);
 
 impl Raw {
     /// Creates texture use data.
-    pub fn process(self, ctx: &Context) -> Result<Texture, TextureCreationError> {
+    pub fn process(self, ctx: &Gfx) -> Result<Texture, TextureCreationError> {
         let Raw(image) = self;
         Texture::new(&ctx.display, image)
     }

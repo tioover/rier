@@ -1,19 +1,18 @@
 //! Object rendering management.
 use std::marker::PhantomData;
-use glium::{Program, DrawParameters, Surface, Blend};
+use glium::{Program, DrawParameters, Blend};
 use glium::uniforms::Uniforms;
 use mesh::{Mesh, Vertex};
-use context::Context;
+use context::{Gfx, Surface, DrawError};
 
-pub use glium::{Frame, DrawError};
 pub use glium::program::ProgramCreationError;
 
 
-/// Rendering context object.
+/// A context object for rendering.
 pub struct Renderer<G>
     where G: Graphics
 {
-    pub context: Context,
+    pub gfx: Gfx,
     program: Program,
     params: DrawParameters<'static>,
     _mark: PhantomData<G>,
@@ -22,29 +21,34 @@ pub struct Renderer<G>
 
 impl<G: Graphics> Renderer<G> {
     /// Creates default renderer.
-    pub fn new(context: Context) -> Result<Renderer<G>, ProgramCreationError> {
-        let program = try!(G::build(&context));
+    pub fn new(gfx: Gfx) -> Result<Renderer<G>, ProgramCreationError> {
+        let program = try!(G::build(&gfx));
         let params = G::draw_parameters();
-        let renderer = Renderer {
-            context: context,
+        Ok(Renderer {
+            gfx: gfx,
             program: program,
             params: params,
             _mark: PhantomData,
-        };
-        Ok(renderer)
+        })
     }
 
-    /// Draws.
-    pub fn draw<U: Uniforms>(&self,
-                             target: &mut Frame,
-                             mesh: &Mesh<G::Vertex>,
-                             uniforms: &U)
-                             -> Result<(), DrawError> {
-        target.draw(&mesh.vertices,
-                    mesh.indices_source(),
-                    &self.program,
-                    uniforms,
-                    &self.params)
+    /// Draw with current frame.
+    pub fn draw<U: Uniforms>(&self, mesh: &Mesh<G::Vertex>, uniforms: &U) -> Result<(), DrawError> {
+        let mut target = self.gfx.get_frame_mut();
+        self.draw_with_target(&mut *target, mesh, uniforms)
+    }
+
+
+    /// Draws with specified surface.
+    pub fn draw_with_target<T, U>(&self,
+                                  target: &mut T,
+                                  mesh: &Mesh<G::Vertex>,
+                                  uniforms: &U)
+                                  -> Result<(), DrawError>
+        where T: Surface,
+              U: Uniforms
+    {
+        target.draw(mesh, mesh, &self.program, uniforms, &self.params)
     }
 }
 
@@ -70,7 +74,7 @@ pub trait Graphics {
     }
 
     /// Builds a program.
-    fn build(ctx: &Context) -> Result<Program, ProgramCreationError> {
+    fn build(ctx: &Gfx) -> Result<Program, ProgramCreationError> {
         Program::from_source(&ctx.display,
                              Self::vertex(),
                              Self::fragment(),

@@ -11,8 +11,8 @@ extern crate either;
 
 
 mod id;
-mod context;
 mod utils;
+pub mod context;
 pub mod transform;
 pub mod camera;
 pub mod event;
@@ -28,6 +28,7 @@ pub use mesh::Mesh;
 pub use render::Graphics;
 pub use camera::{Camera2D, Camera3D};
 pub use transform::Transform;
-pub use context::Context;
-pub use glium::glutin::Event as WindowEvent;
+pub use context::{Gfx, Context};
 pub use utils::{Matrix, AsMatrix, Cache};
+pub use glium::Frame;
+pub use glium::glutin::Event as WindowEvent;
