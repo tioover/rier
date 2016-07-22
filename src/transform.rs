@@ -1,5 +1,5 @@
 //! Component that describes the transform of object.
-
+use std::default::Default;
 use num::{Zero, One};
 use cgmath::{Vector3, Matrix4, Basis3, Quaternion};
 use utils::{AsMatrix, Matrix};
@@ -76,5 +76,12 @@ impl Transform {
 impl AsMatrix for Transform {
     fn matrix(&self) -> &Matrix {
         &self.matrix
+    }
+}
+
+
+impl Default for Transform {
+    fn default() -> Self {
+        Self::new()
     }
 }

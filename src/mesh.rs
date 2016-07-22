@@ -57,11 +57,11 @@ impl<T: Vertex> Mesh<T> {
     }
 
     #[doc(hidden)]
-    pub fn indices_source<'a>(&'a self) -> IndicesSource<'a> {
-        return match self.indices {
+    pub fn indices_source(&self) -> IndicesSource {
+        match self.indices {
             Left(ref x) => x.into(),
             Right(ref x) => x.into(),
-        };
+        }
     }
 }
 

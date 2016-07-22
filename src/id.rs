@@ -1,3 +1,4 @@
+use std::default::Default;
 use time;
 use rand;
 
@@ -19,5 +20,12 @@ impl Id {
             random: rand::random(),
             time: time::now().to_timespec(),
         }
+    }
+}
+
+
+impl Default for Id {
+    fn default() -> Self {
+        Self::new()
     }
 }

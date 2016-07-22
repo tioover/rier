@@ -1,4 +1,5 @@
 //! A simple graphics rendering library.
+
 extern crate num;
 extern crate cgmath;
 #[macro_use]

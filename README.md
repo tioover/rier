@@ -1,26 +1,13 @@
 # 日珥
 Rier is a simple graphics rendering library.
 
-
-## Try
-
-### Build
+## Example
+Needs Rust and Cargo.
 
 ```
-git clone https://github.com/tioover/rier.git
-cd rier
-cargo build
+cargo run --example triangle
 ```
 
-### Example
+## Addition Module
 
-```
-cd sprite
-cargo run --example sprite
-```
-
-### Document
-
-```
-cargo doc --open
-```
+* [sprite](https://github.com/tioover/rier-sprite/)

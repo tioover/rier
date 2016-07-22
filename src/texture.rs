@@ -48,7 +48,7 @@ impl Ref {
 
 
 impl AsUniformValue for Ref {
-    fn as_uniform_value<'a>(&'a self) -> UniformValue<'a> {
+    fn as_uniform_value(&self) -> UniformValue {
         use std::mem::transmute;
         let &Ref(ref tex) = self;
         // type system issue.
