@@ -8,24 +8,6 @@ use cgmath::Matrix4;
 pub type Matrix = Matrix4<f32>;
 
 
-// /// Number types cast function.
-// #[inline]
-// pub fn cast<T, U>(x: T) -> U
-//     where T: NumCast,
-//           U: NumCast
-// {
-//     U::from(x).unwrap()
-// }
-
-
-// /// Puts the current thread to sleep for the specified amount of milliseconds.
-// pub fn sleep_ms(ms: u32) {
-//     use std::thread::sleep;
-//     use std::time::Duration;
-//     sleep(Duration::from_millis(ms as u64));
-// }
-
-
 /// A object that cache the data.
 /// # Example
 ///
