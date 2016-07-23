@@ -3,6 +3,8 @@ use std::default::Default;
 use num::{Zero, One};
 use cgmath::{Vector3, Matrix4, Basis3, Quaternion};
 use utils::{AsMatrix, Matrix};
+use glium::uniforms::{AsUniformValue, UniformValue};
+
 
 pub type Position = Vector3<f32>;
 pub type Scale = f32;
@@ -42,9 +44,10 @@ impl Transform {
     }
 
     fn build_matrix(&self) -> Matrix {
-        Matrix4::from_translation(self.position) *
-        Matrix4::from(*Basis3::from(self.rotation).as_ref()) *
-        Matrix4::from_scale(self.scale)
+        let translation = Matrix4::from_translation(self.position);
+        let rotation = Matrix4::from(*Basis3::from(self.rotation).as_ref());
+        let scale = Matrix4::from_scale(self.scale);
+        translation * rotation * scale
     }
 
     pub fn modify<F>(&mut self, f: F)
@@ -83,5 +86,11 @@ impl AsMatrix for Transform {
 impl Default for Transform {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<'a> AsUniformValue for &'a Transform {
+    fn as_uniform_value(&self) -> UniformValue {
+        self.array().as_uniform_value()
     }
 }

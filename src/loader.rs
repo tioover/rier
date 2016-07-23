@@ -1,7 +1,7 @@
 //! Resource loader.
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::path::{Path, PathBuf};
-
+use std::thread::{JoinHandle, spawn};
 
 /// Asynchronous file loader.
 pub struct Loader<T: Resource> {
@@ -51,5 +51,9 @@ pub trait Resource: Sized {
     /// Creates resource loader.
     fn loader() -> Loader<Self> {
         Loader::new()
+    }
+
+    fn async_load(path: PathBuf) -> JoinHandle<Self::Result> {
+        spawn(move || Self::load(&*path))
     }
 }

@@ -19,5 +19,6 @@ glium = "*"
 time = "*"
 rand = "*"
 cgmath = "*"
-either = "*"
 image = "*"
+[dev-dependencies]
+wavefront_obj = "*"

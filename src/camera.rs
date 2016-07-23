@@ -1,6 +1,7 @@
 //! Camera.
 use num::One;
 use cgmath::{Ortho, PerspectiveFov, Rad, Deg, deg, Point3, vec3};
+use glium::uniforms::{AsUniformValue, UniformValue};
 use context::Gfx;
 use transform::Transform;
 use utils::AsMatrix;
@@ -105,5 +106,18 @@ impl Camera3D {
 impl AsMatrix for Camera3D {
     fn matrix(&self) -> &Matrix {
         &self.matrix
+    }
+}
+
+
+impl<'a> AsUniformValue for &'a Camera2D {
+    fn as_uniform_value(&self) -> UniformValue {
+        self.array().as_uniform_value()
+    }
+}
+
+impl<'a> AsUniformValue for &'a Camera3D {
+    fn as_uniform_value(&self) -> UniformValue {
+        self.array().as_uniform_value()
     }
 }

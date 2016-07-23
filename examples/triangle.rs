@@ -1,8 +1,5 @@
-#[macro_use] extern crate rier;
+extern crate rier;
 #[macro_use] extern crate glium;
-extern crate cgmath;
-
-use rier::{Gfx, Context, AsMatrix, Camera3D};
 
 
 #[derive(Copy, Clone)]
@@ -14,7 +11,6 @@ struct Vertex {
 implement_vertex! {Vertex, position, color}
 
 struct Graphics;
-
 
 impl rier::Graphics for Graphics {
     type Vertex = Vertex;
@@ -51,9 +47,9 @@ void main()
 
 fn main()
 {
-    let gfx = Context::create("Triangle", (800, 600)).gfx();
+    let gfx = rier::Context::create("Triangle", (800, 600)).gfx();
     let renderer = rier::render::Renderer::<Graphics>::new(gfx.clone()).unwrap();
-    let mut camera = Camera3D::new(gfx.clone());
+    let mut camera = rier::Camera3D::new(gfx.clone());
     let mesh = rier::Mesh::new(&gfx, &[
             Vertex { position: [-1.0, -1.0], color: [0.0, 1.0, 0.0] },
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
@@ -68,7 +64,7 @@ fn main()
             }
         }
         gfx.frame(|| {
-            renderer.draw(&mesh, &uniform! { matrix: *camera.array() }).unwrap();
+            renderer.draw(&mesh, &uniform! { matrix: &camera }).unwrap();
         }).unwrap();
     }
 }

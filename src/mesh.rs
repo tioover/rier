@@ -3,7 +3,6 @@
 use glium;
 use glium::index::{PrimitiveType, NoIndices, IndicesSource};
 use glium::vertex::{IntoVerticesSource, VerticesSource};
-use either::{Either, Left, Right};
 use context::Gfx;
 
 pub use glium::VertexBuffer;
@@ -21,9 +20,9 @@ pub type IndexBuffer = glium::IndexBuffer<Index>;
 /// Mesh is a collection of vertices, edges and faces.
 pub struct Mesh<T: Vertex> {
     /// Vertex buffer.
-    pub vertices: VertexBuffer<T>,
+    vertices: VertexBuffer<T>,
     /// Index buffer or none.
-    pub indices: Either<IndexBuffer, NoIndices>,
+    indices: Indices,
 }
 
 
@@ -33,7 +32,7 @@ impl<T: Vertex> Mesh<T> {
     pub fn new(gfx: &Gfx, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError> {
         Ok(Mesh {
             vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
-            indices: Right(NoIndices(PrimitiveType::TrianglesList)),
+            indices: Indices::Nil(NoIndices(PrimitiveType::TrianglesList)),
         })
     }
 
@@ -43,9 +42,9 @@ impl<T: Vertex> Mesh<T> {
                         -> Result<Mesh<T>, CreationError> {
         Ok(Mesh {
             vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
-            indices: Left(try!(IndexBuffer::new(&gfx.display,
-                                                PrimitiveType::TrianglesList,
-                                                indices))),
+            indices: Indices::Buf(try!(IndexBuffer::new(&gfx.display,
+                                                        PrimitiveType::TrianglesList,
+                                                        indices))),
         })
     }
 
@@ -53,17 +52,22 @@ impl<T: Vertex> Mesh<T> {
     pub fn buffer(vertices: VertexBuffer<T>, indices: IndexBuffer) -> Mesh<T> {
         Mesh {
             vertices: vertices,
-            indices: Left(indices),
+            indices: Indices::Buf(indices),
         }
     }
+}
+
+enum Indices {
+    Nil(NoIndices),
+    Buf(IndexBuffer),
 }
 
 
 impl<'a, T: Vertex> Into<IndicesSource<'a>> for &'a Mesh<T> {
     fn into(self) -> IndicesSource<'a> {
         match self.indices {
-            Left(ref x) => x.into(),
-            Right(ref x) => x.into(),
+            Indices::Buf(ref x) => x.into(),
+            Indices::Nil(ref x) => x.into(),
         }
     }
 }

@@ -70,7 +70,7 @@ impl Context {
     }
 
     /// Start a new frame.
-    pub fn start_frame(&self) {
+    fn start_frame(&self) {
         unsafe {
             let mut cell = self.get_cell();
             if cell.is_some() {
@@ -112,7 +112,7 @@ impl Context {
     }
 
     /// End the frame.
-    pub fn end_frame(&self) -> Result<(), SwapBuffersError> {
+    fn end_frame(&self) -> Result<(), SwapBuffersError> {
         unsafe {
             let mut cell = self.get_cell();
             if cell.is_none() {
@@ -133,6 +133,7 @@ impl Context {
     pub fn frame<F>(&self, f: F) -> Result<(), SwapBuffersError>
         where F: FnOnce()
     {
+        // TODO: Refactor and error handling.
         self.start_frame();
         f();
         self.end_frame()

@@ -1,8 +1,9 @@
 //! Utility functions.
 use std::cell::UnsafeCell;
-// use num::NumCast;
+use std::rc::Rc;
+use std::ops::Deref;
 use cgmath::Matrix4;
-
+use glium::uniforms::{AsUniformValue, UniformValue};
 
 /// 4x4 float matrix.
 pub type Matrix = Matrix4<f32>;
@@ -74,5 +75,37 @@ pub trait AsMatrix {
 impl AsMatrix for Matrix {
     fn matrix(&self) -> &Matrix {
         self
+    }
+}
+
+
+/// Reference to the glium uniforms type.
+#[derive(Clone)]
+pub struct Ref<T: AsUniformValue>(Rc<T>);
+
+
+impl<T: AsUniformValue> Ref<T> {
+    pub fn new(data: T) -> Ref<T> {
+        Ref(Rc::new(data))
+    }
+}
+
+
+impl<T: AsUniformValue> AsUniformValue for Ref<T> {
+    fn as_uniform_value(&self) -> UniformValue {
+        use std::mem::transmute;
+        let &Ref(ref tex) = self;
+        // type system issue.
+        unsafe { transmute(tex.deref().as_uniform_value()) }
+    }
+}
+
+
+impl<T: AsUniformValue> Deref for Ref<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        let &Ref(ref tex) = self;
+        tex.deref()
     }
 }

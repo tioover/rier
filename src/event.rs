@@ -8,24 +8,21 @@
 //! use rier::event::{Notifier, Return};
 //!
 //! let mut notifier = Notifier::<i32>::new();
-//! notifier.register(|e| { assert_eq!(e, &42); Return::None });
+//! notifier.register(|e| { assert_eq!(e, &42); Return::Next });
 //! notifier.notify(42);
 //! ```
 
 /// Callback function returns.
 pub enum Return<E> {
-    /// Nothing.
-    None,
+    /// Nothing happen.
+    Next,
     /// The callback will be moved.
     Dead,
-    /// Stop notify this event.
-    Abord,
     /// Start notify this new event.
     Spwan(Box<E>),
 }
 
 /// Event sender.
-
 pub struct Notifier<E> {
     subscribers: Vec<Box<Fn(&E) -> Return<E>>>,
 }
@@ -48,7 +45,7 @@ impl<E> Notifier<E> {
         self.subscribers.retain(|f| {
             match f(&event) {
                 Return::Dead => false,
-                Return::None => true,
+                Return::Next => true,
                 _ => unimplemented!(),
             }
         })
