@@ -1,5 +1,6 @@
 //! Object rendering management.
 use std::marker::PhantomData;
+use std::default::Default;
 use glium::{Program, DrawParameters, Blend};
 use glium::uniforms::Uniforms;
 use mesh::{Mesh, Vertex};
@@ -70,7 +71,7 @@ pub trait Graphics {
 
     /// Represents the parameters to use when drawing.
     fn draw_parameters() -> DrawParameters<'static> {
-        DrawParameters { blend: Blend::alpha_blending(), ..::std::default::Default::default() }
+        DrawParameters { blend: Blend::alpha_blending(), ..Default::default() }
     }
 
     /// Builds a program.

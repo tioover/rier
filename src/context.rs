@@ -46,6 +46,7 @@ impl Context {
         let display = WindowBuilder::new()
             .with_title(title.to_string())
             .with_dimensions(width, height)
+            .with_depth_buffer(24)
             .build_glium()
             .unwrap();
         Context {
@@ -77,8 +78,7 @@ impl Context {
                 println!("Frame has already started.");
             } else {
                 let mut frame = self.display.draw();
-                let (r, g, b, a) = self.clear_color;
-                frame.clear_color(r, g, b, a);
+                frame.clear_color_and_depth(self.clear_color, 1.0);
                 *cell = Some(RefCell::new(frame));
             }
         }

@@ -1,5 +1,6 @@
 extern crate rier;
 #[macro_use] extern crate glium;
+extern crate cgmath;
 
 
 #[derive(Copy, Clone)]
@@ -17,7 +18,7 @@ impl rier::Graphics for Graphics {
 
     fn vertex() -> &'static str {
 r#"
-#version 140
+#version 330 core
 uniform mat4 matrix;
 in vec2 position;
 in vec3 color;
@@ -32,7 +33,7 @@ void main()
 
     fn fragment() -> &'static str {
 r#"
-#version 140
+#version 330 core
 in vec3 vColor;
 out vec4 f_color;
 void main()
@@ -50,6 +51,7 @@ fn main()
     let gfx = rier::Context::create("Triangle", (800, 600)).gfx();
     let renderer = rier::render::Renderer::<Graphics>::new(gfx.clone()).unwrap();
     let mut camera = rier::Camera3D::new(gfx.clone());
+    camera.eye = cgmath::Point3::new(4.0, 3.0, 3.0);
     let mesh = rier::Mesh::new(&gfx, &[
             Vertex { position: [-1.0, -1.0], color: [0.0, 1.0, 0.0] },
             Vertex { position: [ 0.0,  1.0], color: [0.0, 0.0, 1.0] },
