@@ -8,7 +8,7 @@ use utils::AsMatrix;
 use Matrix;
 
 
-/// 2D Camera generator.
+/// Orthogonal 2D Camera.
 ///
 /// Converts screen coordinate to OpenGL world coordinate.
 pub struct Camera2D {
@@ -55,6 +55,7 @@ impl AsMatrix for Camera2D {
 }
 
 
+/// Perspective 3D camera.
 pub struct Camera3D {
     gfx: Gfx,
     pub pov: Deg<f32>,

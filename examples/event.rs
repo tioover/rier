@@ -16,7 +16,6 @@ fn main()
     });
 
     'main: loop {
-
         for event in gfx.display.poll_events() {
             match event {
                 rier::WindowEvent::Closed => break 'main,

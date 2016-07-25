@@ -2,7 +2,7 @@ extern crate rier;
 #[macro_use] extern crate glium;
 extern crate cgmath;
 use glium::DrawParameters;
-use cgmath::{Quaternion, Rotation3, Rad};
+use cgmath::Rad;
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -131,9 +131,8 @@ fn main()
     'main: loop {
         camera.update();
         x += 0.0025;
-        cube.transform.modify(|_, mut rotation, _| {
-            *rotation = Quaternion::from_angle_y(Rad::new(x));
-        });
+        cube.transform.set_rotation(Rad::new(x), Rad::new(x), Rad::new(0.0));
+        cube.transform.dirty();
         for event in gfx.display.poll_events() {
             match event {
                 rier::WindowEvent::Closed => break 'main,
