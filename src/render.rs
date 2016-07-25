@@ -6,25 +6,26 @@ use glium::uniforms::Uniforms;
 use mesh::{Mesh, Vertex};
 use context::{Gfx, Surface, DrawError};
 
+pub use glium::index::PrimitiveType;
 pub use glium::program::ProgramCreationError;
 
 
 /// A context object for rendering.
-pub struct Renderer<G>
-    where G: Graphics
+pub struct Renderer<S>
+    where S: Shader
 {
     pub gfx: Gfx,
     program: Program,
     params: DrawParameters<'static>,
-    _mark: PhantomData<G>,
+    _mark: PhantomData<S>,
 }
 
 
-impl<G: Graphics> Renderer<G> {
+impl<S: Shader> Renderer<S> {
     /// Creates default renderer.
-    pub fn new(gfx: Gfx) -> Result<Renderer<G>, ProgramCreationError> {
-        let program = try!(G::build(&gfx));
-        let params = G::draw_parameters();
+    pub fn new(gfx: Gfx) -> Result<Renderer<S>, ProgramCreationError> {
+        let program = try!(S::build(&gfx));
+        let params = S::draw_parameters();
         Ok(Renderer {
             gfx: gfx,
             program: program,
@@ -34,7 +35,7 @@ impl<G: Graphics> Renderer<G> {
     }
 
     /// Draw with current frame.
-    pub fn draw<U: Uniforms>(&self, mesh: &Mesh<G::Vertex>, uniforms: &U) -> Result<(), DrawError> {
+    pub fn draw<U: Uniforms>(&self, mesh: &Mesh<S::Vertex>, uniforms: &U) -> Result<(), DrawError> {
         let mut target = self.gfx.get_frame_mut();
         self.draw_with_target(&mut *target, mesh, uniforms)
     }
@@ -43,7 +44,7 @@ impl<G: Graphics> Renderer<G> {
     /// Draws with specified surface.
     pub fn draw_with_target<T, U>(&self,
                                   target: &mut T,
-                                  mesh: &Mesh<G::Vertex>,
+                                  mesh: &Mesh<S::Vertex>,
                                   uniforms: &U)
                                   -> Result<(), DrawError>
         where T: Surface,
@@ -55,7 +56,7 @@ impl<G: Graphics> Renderer<G> {
 
 
 /// A marker that provides renderer sittings.
-pub trait Graphics {
+pub trait Shader {
     type Vertex: Vertex;
 
     /// Source code of the vertex shader.
@@ -67,6 +68,10 @@ pub trait Graphics {
     /// Source code of the geometry shader.
     fn geometry() -> Option<&'static str> {
         None
+    }
+
+    fn primitive_type() -> PrimitiveType {
+        PrimitiveType::TrianglesList
     }
 
     /// Represents the parameters to use when drawing.

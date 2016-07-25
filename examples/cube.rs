@@ -2,7 +2,6 @@ extern crate rier;
 #[macro_use] extern crate glium;
 extern crate cgmath;
 use glium::DrawParameters;
-use rier::render::Renderer;
 use cgmath::{Quaternion, Rotation3, Rad};
 
 #[derive(Copy, Clone)]
@@ -13,40 +12,42 @@ struct Vertex {
 
 implement_vertex! {Vertex, position, color}
 
-struct Graphics;
 
+struct Shader;
 
-impl rier::Graphics for Graphics {
+type Renderer = rier::Renderer<Shader>;
+
+impl rier::Shader for Shader {
     type Vertex = Vertex;
 
     fn vertex() -> &'static str {
-r#"
-#version 330 core
-uniform mat4 matrix;
-in vec3 position;
-in vec3 color;
-out vec3 vColor;
+        r#"
+        #version 330 core
+        uniform mat4 matrix;
+        in vec3 position;
+        in vec3 color;
+        out vec3 v_color;
 
-void main()
-{
-    gl_Position = matrix * vec4(position, 1.0);
-    vColor = color;
-}
-"#
+        void main()
+        {
+            gl_Position = matrix * vec4(position, 1.0);
+            v_color = color;
+        }
+        "#
     }
 
     fn fragment() -> &'static str {
-r#"
-#version 330 core
-in vec3 position;
-in vec3 vColor;
-out vec4 f_color;
+        r#"
+        #version 330 core
+        in vec3 position;
+        in vec3 v_color;
+        out vec4 f_color;
 
-void main()
-{
-    f_color = vec4(vColor, 1.0);
-}
-"#
+        void main()
+        {
+            f_color = vec4(v_color  , 1.0);
+        }
+        "#
     }
 
     fn draw_parameters() -> DrawParameters<'static> {
@@ -75,14 +76,14 @@ struct Cube {
 
 
 impl Cube {
-    fn new(gfx: &rier::Gfx) -> Cube {
+    fn new(renderer: &Renderer) -> Cube {
         Cube {
-            mesh: Cube::mesh(gfx),
+            mesh: Cube::mesh(renderer),
             transform: rier::Transform::new(),
         }
     }
 
-    fn mesh(gfx: &rier::Gfx) -> rier::Mesh<Vertex> {
+    fn mesh(renderer: &Renderer) -> rier::Mesh<Vertex> {
         let indices = [
             0, 1, 2,
             3, 0, 4,
@@ -107,10 +108,10 @@ impl Cube {
             Vertex { position: [ 1.0,-1.0,-1.0], color: [0.0, 0.0, 0.0] },
             Vertex { position: [ 1.0, 1.0, 1.0], color: [0.9, 0.2, 0.5] },
         ];
-        rier::Mesh::with_indices(gfx, &vertices, &indices).unwrap()
+        rier::Mesh::with_indices(renderer, &vertices, &indices).unwrap()
     }
 
-    fn render(&self, renderer: &Renderer<Graphics>, camera: &rier::Camera3D) {
+    fn render(&self, renderer: &Renderer, camera: &rier::Camera3D) {
         use rier::AsMatrix;
 
         let matrix: [[_; 4]; 4] = (camera.matrix() * self.transform.matrix()).into();
@@ -122,10 +123,10 @@ impl Cube {
 fn main()
 {
     let gfx = rier::Context::create("Cube", (800, 600)).gfx();
-    let renderer = Renderer::<Graphics>::new(gfx.clone()).unwrap();
+    let renderer = Renderer::new(gfx.clone()).unwrap();
     let mut camera = rier::Camera3D::new(gfx.clone());
     camera.eye = cgmath::Point3::new(4.0, 3.0, 3.0);
-    let mut cube = Cube::new(&gfx);
+    let mut cube = Cube::new(&renderer);
     let mut x = 0.0f32;
     'main: loop {
         camera.update();

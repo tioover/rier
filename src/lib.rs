@@ -24,7 +24,7 @@ pub mod render;
 
 pub use id::Id;
 pub use mesh::Mesh;
-pub use render::Graphics;
+pub use render::{Renderer, Shader};
 pub use camera::{Camera2D, Camera3D};
 pub use transform::Transform;
 pub use context::{Gfx, Context};

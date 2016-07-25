@@ -1,9 +1,9 @@
 //! Polygon mesh.
 
 use glium;
-use glium::index::{PrimitiveType, NoIndices, IndicesSource};
+use glium::index::{NoIndices, IndicesSource};
 use glium::vertex::{IntoVerticesSource, VerticesSource};
-use context::Gfx;
+use render::{PrimitiveType, Shader, Renderer};
 
 pub use glium::VertexBuffer;
 pub use glium::Vertex;
@@ -29,20 +29,24 @@ pub struct Mesh<T: Vertex> {
 impl<T: Vertex> Mesh<T> {
     /// Creates a simple mesh object.
     /// Primitive type is triangles list, no indices need.
-    pub fn new(gfx: &Gfx, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError> {
+    pub fn new<S>(renderer: &Renderer<S>, vertices: &[T]) -> Result<Mesh<T>, VertexCreationError>
+        where S: Shader<Vertex = T>
+    {
         Ok(Mesh {
-            vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
-            indices: Indices::Nil(NoIndices(PrimitiveType::TrianglesList)),
+            vertices: try!(VertexBuffer::new(&renderer.gfx.display, vertices)),
+            indices: Indices::Nil(NoIndices(S::primitive_type())),
         })
     }
 
-    pub fn with_indices(gfx: &Gfx,
-                        vertices: &[T],
-                        indices: &[Index])
-                        -> Result<Mesh<T>, CreationError> {
+    pub fn with_indices<S>(renderer: &Renderer<S>,
+                           vertices: &[T],
+                           indices: &[Index])
+                           -> Result<Mesh<T>, CreationError>
+        where S: Shader<Vertex = T>
+    {
         Ok(Mesh {
-            vertices: try!(VertexBuffer::new(&gfx.display, vertices)),
-            indices: Indices::Buf(try!(IndexBuffer::new(&gfx.display,
+            vertices: try!(VertexBuffer::new(&renderer.gfx.display, vertices)),
+            indices: Indices::Buf(try!(IndexBuffer::new(&renderer.gfx.display,
                                                         PrimitiveType::TrianglesList,
                                                         indices))),
         })
