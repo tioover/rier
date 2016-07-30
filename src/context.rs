@@ -47,6 +47,7 @@ impl Context {
             .with_title(title.to_string())
             .with_dimensions(width, height)
             .with_depth_buffer(24)
+            .with_vsync()
             .build_glium()
             .unwrap();
         Context {

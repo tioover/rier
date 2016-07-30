@@ -4,6 +4,7 @@ extern crate cgmath;
 use glium::DrawParameters;
 use cgmath::Rad;
 
+
 #[derive(Copy, Clone)]
 struct Vertex {
     position: [f32; 3],
@@ -23,14 +24,15 @@ impl rier::Shader for Shader {
     fn vertex() -> &'static str {
         r#"
         #version 330 core
-        uniform mat4 matrix;
+        uniform mat4 camera;
+        uniform mat4 transform;
         in vec3 position;
         in vec3 color;
         out vec3 v_color;
 
         void main()
         {
-            gl_Position = matrix * vec4(position, 1.0);
+            gl_Position = camera * transform * vec4(position, 1.0);
             v_color = color;
         }
         "#
@@ -112,10 +114,10 @@ impl Cube {
     }
 
     fn render(&self, renderer: &Renderer, camera: &rier::Camera3D) {
-        use rier::AsMatrix;
-
-        let matrix: [[_; 4]; 4] = (camera.matrix() * self.transform.matrix()).into();
-        renderer.draw(&self.mesh, &uniform! { matrix: matrix }).unwrap();
+        renderer.draw(&self.mesh, &uniform! {
+            camera: camera,
+            transform: &self.transform
+        }).unwrap();
     }
 }
 
@@ -128,19 +130,23 @@ fn main()
     camera.eye = cgmath::Point3::new(4.0, 3.0, 3.0);
     let mut cube = Cube::new(&renderer);
     let mut x = 0.0f32;
-    'main: loop {
+    let main_loop = rier::Loop::new(move |delta| {
+        use rier::main_loop::Return::*;
+
         camera.update();
-        x += 0.0025;
+        x += delta.subsec_nanos() as f32 / 1000000000.0;
         cube.transform.set_rotation(Rad::new(x), Rad::new(x), Rad::new(0.0));
         cube.transform.dirty();
         for event in gfx.display.poll_events() {
             match event {
-                rier::WindowEvent::Closed => break 'main,
+                rier::WindowEvent::Closed => return Exit,
                 _ => (),
             }
         }
         gfx.frame(|| {
             cube.render(&renderer, &camera);
         }).unwrap();
-    }
+        Next
+    });
+    main_loop.start();
 }

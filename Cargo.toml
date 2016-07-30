@@ -20,5 +20,6 @@ time = "*"
 rand = "*"
 cgmath = "*"
 image = "*"
+fps_counter = "*"
 [dev-dependencies]
 wavefront_obj = "*"
