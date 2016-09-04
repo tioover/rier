@@ -1,6 +1,6 @@
 //! Camera.
 use num::One;
-use cgmath::{Ortho, PerspectiveFov, Rad, Deg, deg, Point3, vec3};
+use cgmath::{Ortho, PerspectiveFov, Rad, Deg, Point3, vec3};
 use glium::uniforms::{AsUniformValue, UniformValue};
 use context::Gfx;
 use transform::Transform;
@@ -71,7 +71,7 @@ impl Camera3D {
     pub fn new(gfx: Gfx) -> Camera3D {
         let mut camera = Camera3D {
             gfx: gfx,
-            pov: deg(45.0),
+            pov: Deg(45.0),
             near: 0.1,
             far: 100.0,
             eye: Point3::new(0.0, 0.0, 1.0),

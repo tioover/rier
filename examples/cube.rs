@@ -135,7 +135,7 @@ fn main()
 
         camera.update();
         x += delta.subsec_nanos() as f32 / 1000000000.0;
-        cube.transform.set_rotation(Rad::new(x), Rad::new(x), Rad::new(0.0));
+        cube.transform.set_rotation(Rad(x), Rad(x), Rad(0.0));
         cube.transform.dirty();
         for event in gfx.display.poll_events() {
             match event {

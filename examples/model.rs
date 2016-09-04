@@ -77,7 +77,7 @@ impl rier::Shader for Shader {
         }
 
         void main() {
-            vec3 obj_color = vec3(1.0, 0.5, 0.31);
+            vec3 obj_color = vec3(0.25, 0.7, 0.25);
             vec3 result = (ambient()+diffuse()+specular()) * obj_color;
             f_color = vec4(result, 1.0);
         }
@@ -120,7 +120,7 @@ impl Model {
     }
 
     fn load() -> obj::Object {
-        let mut file = File::open("./examples/assets/model.obj").unwrap();
+        let mut file = File::open("./examples/assets/monkey.obj").unwrap();
         let mut s = String::new();
         file.read_to_string(&mut s).unwrap();
         let mut objects = obj::parse(s).unwrap();
@@ -185,7 +185,7 @@ fn main() {
 
         camera.update();
         x += delta.subsec_nanos() as f32 / 1000000000.0;
-        model.transform.set_rotation(Rad::new(x), Rad::new(x), Rad::new(0.0));
+        model.transform.set_rotation(Rad(x), Rad(x), Rad(0.0));
         model.transform.dirty();
         for event in gfx.display.poll_events() {
             match event {
