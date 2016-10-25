@@ -143,8 +143,8 @@ impl Model {
         let object = Model::load();
         for geometry in &object.geometry {
             for shape in &geometry.shapes {
-                match shape {
-                    &obj::Shape::Triangle(a, b, c) => {
+                match shape.primitive {
+                    obj::Primitive::Triangle(a, b, c) => {
                         vertices.push(Model::make_vertex(&object, a));
                         vertices.push(Model::make_vertex(&object, b));
                         vertices.push(Model::make_vertex(&object, c));
