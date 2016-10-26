@@ -1,6 +1,5 @@
 //! Main rendering loop and frame rate control.
-//! use std::sync::mpsc::{channel, Sender, Receiver};
-//! use std::thread::spawn;
+
 use std::time::{Duration, Instant};
 use std::thread::sleep;
 use fps_counter::FPSCounter;

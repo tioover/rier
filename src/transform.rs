@@ -18,9 +18,9 @@ use glium::uniforms::{AsUniformValue, UniformValue};
 /// let _ = transform.matrix();
 /// ```
 pub struct Transform {
-    /// Ojbect scale, default `1`.
+    /// Object scale, default `1`.
     pub scale: f32,
-    /// Ojbect translation, default `(0, 0, 0)`.
+    /// Object translation, default `(0, 0, 0)`.
     pub position: Vector3<f32>,
     /// Object rotation, default do nothing.
     pub rotation: Quaternion<f32>,
